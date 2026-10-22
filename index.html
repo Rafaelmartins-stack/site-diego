@@ -649,6 +649,9 @@
         if (mode === 'staff') {
           editorFeedback.textContent = 'Painel da equipe liberado. Faça as alterações e salve quando terminar.';
         }
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+        }, 50);
       }
 
       function showRoleChoices() {
@@ -757,255 +760,299 @@
       document.querySelectorAll('.reveal').forEach((element) => revealObserver.observe(element));
     </script>
 
-    <!-- Three.js 3D Library -->
+    <!-- Three.js 3D Library with Automatic CDN Fallback -->
     <script src="assets/three.min.js"></script>
+    <script>
+      if (typeof THREE === 'undefined') {
+        document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+      }
+    </script>
 
     <!-- 3D Dumbbell Interactive Controller -->
     <script>
       (function init3DDumbbell() {
         const container = document.getElementById('dumbbellContainer');
         const canvas = document.getElementById('dumbbellCanvas');
-        if (!container || !canvas || typeof THREE === 'undefined') return;
+        if (!container || !canvas) return;
 
-        // Scene setup
-        const scene = new THREE.Scene();
-
-        // Camera
-        const camera = new THREE.PerspectiveCamera(38, container.clientWidth / container.clientHeight, 0.1, 100);
-        camera.position.set(0, 0, 7.8);
-
-        // WebGL Renderer
-        const renderer = new THREE.WebGLRenderer({
-          canvas: canvas,
-          antialias: true,
-          alpha: true,
-          powerPreference: 'high-performance'
-        });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        // Group for the entire dumbbell
-        const dumbbell = new THREE.Group();
-        scene.add(dumbbell);
-
-        // Materials with realistic studio reflections
-        const handleMaterial = new THREE.MeshStandardMaterial({
-          color: 0xe2e8f0,
-          metalness: 0.92,
-          roughness: 0.2,
-        });
-
-        const rubberMaterial = new THREE.MeshStandardMaterial({
-          color: 0x1f2923,
-          metalness: 0.3,
-          roughness: 0.48,
-        });
-
-        const brandGreenMaterial = new THREE.MeshStandardMaterial({
-          color: 0x42745e,
-          metalness: 0.75,
-          roughness: 0.28,
-        });
-
-        const terracottaMaterial = new THREE.MeshStandardMaterial({
-          color: 0xd67b5d,
-          metalness: 0.8,
-          roughness: 0.25,
-        });
-
-        // 1. Center Handle (Steel knurled bar)
-        const handleGeom = new THREE.CylinderGeometry(0.2, 0.2, 3.4, 32);
-        const handle = new THREE.Mesh(handleGeom, handleMaterial);
-        handle.rotation.z = Math.PI / 2;
-        dumbbell.add(handle);
-
-        // Grip safety collars
-        [-1.18, 1.18].forEach((x) => {
-          const collarGeom = new THREE.CylinderGeometry(0.32, 0.32, 0.12, 32);
-          const collar = new THREE.Mesh(collarGeom, brandGreenMaterial);
-          collar.rotation.z = Math.PI / 2;
-          collar.position.x = x;
-          dumbbell.add(collar);
-        });
-
-        // 2. Hexagonal Dumbbell Heads (Left & Right)
-        [-1, 1].forEach((dir) => {
-          const head = new THREE.Group();
-
-          // Main Cast Iron / Rubber Hex Head
-          const hexGeom = new THREE.CylinderGeometry(1.15, 1.15, 0.85, 6);
-          const hex = new THREE.Mesh(hexGeom, rubberMaterial);
-          hex.rotation.z = Math.PI / 2;
-          hex.rotation.y = Math.PI / 6;
-          head.add(hex);
-
-          // Accent ring plate
-          const ringGeom = new THREE.CylinderGeometry(1.02, 1.02, 0.1, 6);
-          const ring = new THREE.Mesh(ringGeom, brandGreenMaterial);
-          ring.rotation.z = Math.PI / 2;
-          ring.rotation.y = Math.PI / 6;
-          ring.position.x = dir * 0.42;
-          head.add(ring);
-
-          // Terracotta End cap
-          const capGeom = new THREE.CylinderGeometry(0.48, 0.48, 0.12, 32);
-          const cap = new THREE.Mesh(capGeom, terracottaMaterial);
-          cap.rotation.z = Math.PI / 2;
-          cap.position.x = dir * 0.49;
-          head.add(cap);
-
-          // Outer bolt
-          const boltGeom = new THREE.CylinderGeometry(0.2, 0.2, 0.1, 6);
-          const bolt = new THREE.Mesh(boltGeom, handleMaterial);
-          bolt.rotation.z = Math.PI / 2;
-          bolt.position.x = dir * 0.56;
-          head.add(bolt);
-
-          head.position.x = dir * 1.75;
-          dumbbell.add(head);
-        });
-
-        // Initial 3D diagonal pose
-        dumbbell.rotation.x = 0.38;
-        dumbbell.rotation.y = -0.65;
-        dumbbell.rotation.z = 0.28;
-
-        // 3. Dynamic Floor Shadow
-        const shadowCanvas = document.createElement('canvas');
-        shadowCanvas.width = 128;
-        shadowCanvas.height = 128;
-        const shadowCtx = shadowCanvas.getContext('2d');
-        const grad = shadowCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
-        grad.addColorStop(0, 'rgba(30, 50, 45, 0.38)');
-        grad.addColorStop(0.5, 'rgba(30, 50, 45, 0.15)');
-        grad.addColorStop(1, 'rgba(30, 50, 45, 0)');
-        shadowCtx.fillStyle = grad;
-        shadowCtx.fillRect(0, 0, 128, 128);
-
-        const shadowTexture = new THREE.CanvasTexture(shadowCanvas);
-        const shadowGeo = new THREE.PlaneGeometry(5.8, 3.4);
-        const shadowMat = new THREE.MeshBasicMaterial({
-          map: shadowTexture,
-          transparent: true,
-          opacity: 0.75,
-          depthWrite: false
-        });
-        const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
-        shadowMesh.position.y = -2.1;
-        shadowMesh.rotation.x = -Math.PI / 2;
-        scene.add(shadowMesh);
-
-        // 4. Lighting System
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
-        scene.add(ambientLight);
-
-        // Key directional light (top-left)
-        const keyLight = new THREE.DirectionalLight(0xffffff, 1.25);
-        keyLight.position.set(6, 8, 6);
-        scene.add(keyLight);
-
-        // Fill light (sage green brand reflection)
-        const fillLight = new THREE.PointLight(0x42745e, 1.6, 18);
-        fillLight.position.set(-6, -2, 5);
-        scene.add(fillLight);
-
-        // Rim light (terracotta warm highlight)
-        const rimLight = new THREE.PointLight(0xd67b5d, 1.4, 18);
-        rimLight.position.set(5, -4, -4);
-        scene.add(rimLight);
-
-        // 5. Interactive Motion Tracking
-        let targetRotX = 0.38;
-        let targetRotY = -0.65;
-        let targetRotZ = 0.28;
-        let targetPosX = 0;
-        let targetPosY = 0;
-
-        let isDragging = false;
-        let prevPointerX = 0;
-        let prevPointerY = 0;
-        let dragRotX = 0;
-        let dragRotY = 0;
-
-        // Mouse movement tracking (follows mouse across the screen)
-        window.addEventListener('pointermove', (e) => {
-          if (isDragging) {
-            const deltaX = e.clientX - prevPointerX;
-            const deltaY = e.clientY - prevPointerY;
-            dragRotY += deltaX * 0.008;
-            dragRotX += deltaY * 0.008;
-            prevPointerX = e.clientX;
-            prevPointerY = e.clientY;
+        function start3D() {
+          if (typeof THREE === 'undefined') {
+            setTimeout(start3D, 60);
             return;
           }
 
-          const rect = container.getBoundingClientRect();
-          const centerX = rect.left + rect.width / 2;
-          const centerY = rect.top + rect.height / 2;
+          // Scene setup
+          const scene = new THREE.Scene();
 
-          const normX = (e.clientX - centerX) / (window.innerWidth / 2);
-          const normY = (e.clientY - centerY) / (window.innerHeight / 2);
+          // Camera with generous field of view
+          const camera = new THREE.PerspectiveCamera(38, (container.clientWidth || 450) / (container.clientHeight || 450), 0.1, 100);
+          camera.position.set(0, 0, 9.2);
 
-          const clampedX = Math.max(-1.2, Math.min(1.2, normX));
-          const clampedY = Math.max(-1.2, Math.min(1.2, normY));
+          // WebGL Renderer
+          const renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true,
+            alpha: true,
+            powerPreference: 'high-performance'
+          });
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-          targetRotY = clampedX * 1.3 - 0.55;
-          targetRotX = -clampedY * 0.9 + 0.35;
-          targetRotZ = clampedX * 0.35 + 0.18;
-          targetPosX = clampedX * 0.45;
-          targetPosY = -clampedY * 0.35;
-        });
+          function updateCanvasSize() {
+            const w = container.clientWidth || 450;
+            const h = container.clientHeight || 450;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+          }
+          updateCanvasSize();
 
-        // Click & Drag support for full 360 inspection
-        container.addEventListener('pointerdown', (e) => {
-          isDragging = true;
-          prevPointerX = e.clientX;
-          prevPointerY = e.clientY;
-          container.setPointerCapture(e.pointerId);
-        });
+          // Group for the entire dumbbell
+          const dumbbell = new THREE.Group();
+          dumbbell.scale.set(0.85, 0.85, 0.85);
+          scene.add(dumbbell);
 
-        container.addEventListener('pointerup', (e) => {
-          isDragging = false;
-          try { container.releasePointerCapture(e.pointerId); } catch(err) {}
-        });
+          // Materials with realistic studio reflections
+          const handleMaterial = new THREE.MeshStandardMaterial({
+            color: 0xf8fafc,
+            metalness: 0.95,
+            roughness: 0.16,
+          });
 
-        container.addEventListener('pointercancel', () => { isDragging = false; });
+          const gripMaterial = new THREE.MeshStandardMaterial({
+            color: 0xcfd8dc,
+            metalness: 0.85,
+            roughness: 0.55,
+          });
 
-        // 6. Smooth Animation Loop
-        const clock = new THREE.Clock();
-        function renderLoop() {
-          requestAnimationFrame(renderLoop);
-          const time = clock.getElapsedTime();
+          const rubberMaterial = new THREE.MeshStandardMaterial({
+            color: 0x223028,
+            metalness: 0.45,
+            roughness: 0.35,
+          });
 
-          // Gentle breathing float
-          const floatY = Math.sin(time * 2.0) * 0.12;
-          const idleWobble = Math.cos(time * 1.4) * 0.06;
+          const brandGreenMaterial = new THREE.MeshStandardMaterial({
+            color: 0x3d705c,
+            metalness: 0.8,
+            roughness: 0.22,
+          });
 
-          // Interpolation (lerp) for smooth weight physics
-          const lerp = 0.055;
-          dumbbell.rotation.x += (targetRotX + dragRotX + idleWobble * 0.5 - dumbbell.rotation.x) * lerp;
-          dumbbell.rotation.y += (targetRotY + dragRotY + idleWobble - dumbbell.rotation.y) * lerp;
-          dumbbell.rotation.z += (targetRotZ - dumbbell.rotation.z) * lerp;
+          const terracottaMaterial = new THREE.MeshStandardMaterial({
+            color: 0xde7958,
+            metalness: 0.85,
+            roughness: 0.22,
+          });
 
-          dumbbell.position.x += (targetPosX - dumbbell.position.x) * lerp;
-          dumbbell.position.y += (targetPosY + floatY - dumbbell.position.y) * lerp;
+          // 1. Center Handle (Steel bar)
+          const handleGeom = new THREE.CylinderGeometry(0.2, 0.2, 3.4, 32);
+          const handle = new THREE.Mesh(handleGeom, handleMaterial);
+          handle.rotation.z = Math.PI / 2;
+          dumbbell.add(handle);
 
-          // Shadow follows position
-          shadowMesh.position.x = dumbbell.position.x * 0.65;
-          const shadowScale = 1 + Math.abs(floatY) * 0.25;
-          shadowMesh.scale.set(shadowScale, shadowScale, 1);
+          // Knurled grip bands on the handle
+          [-0.55, 0.55].forEach((x) => {
+            const gripGeom = new THREE.CylinderGeometry(0.208, 0.208, 0.75, 32);
+            const grip = new THREE.Mesh(gripGeom, gripMaterial);
+            grip.rotation.z = Math.PI / 2;
+            grip.position.x = x;
+            dumbbell.add(grip);
+          });
 
-          renderer.render(scene, camera);
+          // Grip safety collars
+          [-1.2, 1.2].forEach((x) => {
+            const collarGeom = new THREE.CylinderGeometry(0.32, 0.32, 0.12, 32);
+            const collar = new THREE.Mesh(collarGeom, brandGreenMaterial);
+            collar.rotation.z = Math.PI / 2;
+            collar.position.x = x;
+            dumbbell.add(collar);
+          });
+
+          // 2. Hexagonal Dumbbell Heads (Left & Right)
+          [-1, 1].forEach((dir) => {
+            const head = new THREE.Group();
+
+            // Main Cast Iron / Rubber Hex Head
+            const hexGeom = new THREE.CylinderGeometry(1.15, 1.15, 0.85, 6);
+            const hex = new THREE.Mesh(hexGeom, rubberMaterial);
+            hex.rotation.z = Math.PI / 2;
+            hex.rotation.y = Math.PI / 6;
+            head.add(hex);
+
+            // Accent ring plate
+            const ringGeom = new THREE.CylinderGeometry(1.02, 1.02, 0.1, 6);
+            const ring = new THREE.Mesh(ringGeom, brandGreenMaterial);
+            ring.rotation.z = Math.PI / 2;
+            ring.rotation.y = Math.PI / 6;
+            ring.position.x = dir * 0.42;
+            head.add(ring);
+
+            // Terracotta End cap
+            const capGeom = new THREE.CylinderGeometry(0.48, 0.48, 0.12, 32);
+            const cap = new THREE.Mesh(capGeom, terracottaMaterial);
+            cap.rotation.z = Math.PI / 2;
+            cap.position.x = dir * 0.49;
+            head.add(cap);
+
+            // Outer bolt
+            const boltGeom = new THREE.CylinderGeometry(0.2, 0.2, 0.1, 6);
+            const bolt = new THREE.Mesh(boltGeom, handleMaterial);
+            bolt.rotation.z = Math.PI / 2;
+            bolt.position.x = dir * 0.56;
+            head.add(bolt);
+
+            head.position.x = dir * 1.75;
+            dumbbell.add(head);
+          });
+
+          // Initial 3D diagonal pose
+          dumbbell.rotation.x = 0.38;
+          dumbbell.rotation.y = -0.65;
+          dumbbell.rotation.z = 0.28;
+
+          // 3. Dynamic Floor Shadow
+          const shadowCanvas = document.createElement('canvas');
+          shadowCanvas.width = 128;
+          shadowCanvas.height = 128;
+          const shadowCtx = shadowCanvas.getContext('2d');
+          const grad = shadowCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
+          grad.addColorStop(0, 'rgba(30, 50, 45, 0.42)');
+          grad.addColorStop(0.5, 'rgba(30, 50, 45, 0.16)');
+          grad.addColorStop(1, 'rgba(30, 50, 45, 0)');
+          shadowCtx.fillStyle = grad;
+          shadowCtx.fillRect(0, 0, 128, 128);
+
+          const shadowTexture = new THREE.CanvasTexture(shadowCanvas);
+          const shadowGeo = new THREE.PlaneGeometry(5.8, 3.4);
+          const shadowMat = new THREE.MeshBasicMaterial({
+            map: shadowTexture,
+            transparent: true,
+            opacity: 0.8,
+            depthWrite: false
+          });
+          const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
+          shadowMesh.position.y = -2.1;
+          shadowMesh.rotation.x = -Math.PI / 2;
+          scene.add(shadowMesh);
+
+          // 4. Studio Lighting System
+          const ambientLight = new THREE.AmbientLight(0xffffff, 1.15);
+          scene.add(ambientLight);
+
+          // Key light (top-front-right)
+          const keyLight = new THREE.DirectionalLight(0xffffff, 1.7);
+          keyLight.position.set(4, 7, 7);
+          scene.add(keyLight);
+
+          // Front fill light (illuminates the front face)
+          const frontLight = new THREE.DirectionalLight(0xffffff, 0.9);
+          frontLight.position.set(0, 1, 8);
+          scene.add(frontLight);
+
+          // Fill light (sage green reflection)
+          const fillLight = new THREE.DirectionalLight(0x71b294, 1.1);
+          fillLight.position.set(-6, 2, 4);
+          scene.add(fillLight);
+
+          // Rim light (terracotta highlight)
+          const rimLight = new THREE.DirectionalLight(0xf49d7b, 1.3);
+          rimLight.position.set(5, -3, -3);
+          scene.add(rimLight);
+
+          // 5. Interactive Motion Tracking
+          let targetRotX = 0.38;
+          let targetRotY = -0.65;
+          let targetRotZ = 0.28;
+          let targetPosX = 0;
+          let targetPosY = 0;
+
+          let isDragging = false;
+          let prevPointerX = 0;
+          let prevPointerY = 0;
+          let dragRotX = 0;
+          let dragRotY = 0;
+
+          // Mouse movement tracking (follows mouse across the screen)
+          window.addEventListener('pointermove', (e) => {
+            if (isDragging) {
+              const deltaX = e.clientX - prevPointerX;
+              const deltaY = e.clientY - prevPointerY;
+              dragRotY += deltaX * 0.008;
+              dragRotX += deltaY * 0.008;
+              prevPointerX = e.clientX;
+              prevPointerY = e.clientY;
+              return;
+            }
+
+            const rect = container.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            const normX = (e.clientX - centerX) / (window.innerWidth / 2);
+            const normY = (e.clientY - centerY) / (window.innerHeight / 2);
+
+            const clampedX = Math.max(-1.2, Math.min(1.2, normX));
+            const clampedY = Math.max(-1.2, Math.min(1.2, normY));
+
+            targetRotY = clampedX * 1.3 - 0.55;
+            targetRotX = -clampedY * 0.9 + 0.35;
+            targetRotZ = clampedX * 0.35 + 0.18;
+            targetPosX = clampedX * 0.45;
+            targetPosY = -clampedY * 0.35;
+          });
+
+          // Click & Drag support for full 360 inspection
+          container.addEventListener('pointerdown', (e) => {
+            isDragging = true;
+            prevPointerX = e.clientX;
+            prevPointerY = e.clientY;
+            container.setPointerCapture(e.pointerId);
+          });
+
+          container.addEventListener('pointerup', (e) => {
+            isDragging = false;
+            try { container.releasePointerCapture(e.pointerId); } catch(err) {}
+          });
+
+          container.addEventListener('pointercancel', () => { isDragging = false; });
+
+          // 6. Smooth Animation Loop
+          const clock = new THREE.Clock();
+          function renderLoop() {
+            requestAnimationFrame(renderLoop);
+            const time = clock.getElapsedTime();
+
+            // Gentle breathing float
+            const floatY = Math.sin(time * 2.0) * 0.12;
+            const idleWobble = Math.cos(time * 1.4) * 0.06;
+
+            // Interpolation (lerp) for smooth weight physics
+            const lerp = 0.055;
+            dumbbell.rotation.x += (targetRotX + dragRotX + idleWobble * 0.5 - dumbbell.rotation.x) * lerp;
+            dumbbell.rotation.y += (targetRotY + dragRotY + idleWobble - dumbbell.rotation.y) * lerp;
+            dumbbell.rotation.z += (targetRotZ - dumbbell.rotation.z) * lerp;
+
+            dumbbell.position.x += (targetPosX - dumbbell.position.x) * lerp;
+            dumbbell.position.y += (targetPosY + floatY - dumbbell.position.y) * lerp;
+
+            // Shadow follows position
+            shadowMesh.position.x = dumbbell.position.x * 0.65;
+            const shadowScale = 1 + Math.abs(floatY) * 0.25;
+            shadowMesh.scale.set(shadowScale, shadowScale, 1);
+
+            renderer.render(scene, camera);
+          }
+          renderLoop();
+
+          // 7. Responsive Resize Listeners
+          window.addEventListener('resize', updateCanvasSize);
+          setTimeout(updateCanvasSize, 100);
+          setTimeout(updateCanvasSize, 500);
         }
-        renderLoop();
 
-        // 7. Responsive Resize
-        window.addEventListener('resize', () => {
-          if (!container.clientWidth || !container.clientHeight) return;
-          camera.aspect = container.clientWidth / container.clientHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(container.clientWidth, container.clientHeight);
-        });
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', start3D);
+        } else {
+          start3D();
+        }
       })();
     </script>
   </body>
