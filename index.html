@@ -952,15 +952,25 @@
           }
 
           // Discos circulares alinhados: duas placas por lado, como um halter de academia real.
+          const stack = {
+            inner: 1.56,
+            outer: 2.1,
+            rim: 2.345,
+            face: 2.392,
+            outerRidge: 2.438,
+            innerRidge: 2.446,
+            center: 2.418,
+            hub: 2.475
+          };
           [-1, 1].forEach((dir) => {
-            const innerPlate = createPlate(1.04, 0.34, rubberMaterial, dir * 1.94);
-            const outerPlate = createPlate(1.1, 0.42, rubberMaterial, dir * 2.5);
-            const outerRim = createPlate(1.115, 0.075, rubberEdgeMaterial, dir * 2.745);
-            const faceInset = createPlate(0.76, 0.035, plateFaceMaterial, dir * 2.792);
-            const outerRidge = createFaceRing(0.93, 0.045, rubberEdgeMaterial, dir * 2.838);
-            const innerRidge = createFaceRing(0.5, 0.024, collarMaterial, dir * 2.846);
-            const faceRing = createPlate(0.56, 0.045, collarMaterial, dir * 2.818);
-            const hub = createPlate(0.3, 0.18, steelMaterial, dir * 2.875);
+            const innerPlate = createPlate(1.04, 0.34, rubberMaterial, dir * stack.inner);
+            const outerPlate = createPlate(1.1, 0.42, rubberMaterial, dir * stack.outer);
+            const outerRim = createPlate(1.115, 0.075, rubberEdgeMaterial, dir * stack.rim);
+            const faceInset = createPlate(0.76, 0.035, plateFaceMaterial, dir * stack.face);
+            const outerRidge = createFaceRing(0.93, 0.045, rubberEdgeMaterial, dir * stack.outerRidge);
+            const innerRidge = createFaceRing(0.5, 0.024, collarMaterial, dir * stack.innerRidge);
+            const faceRing = createPlate(0.56, 0.045, collarMaterial, dir * stack.center);
+            const hub = createPlate(0.3, 0.18, steelMaterial, dir * stack.hub);
 
             dumbbell.add(innerPlate, outerPlate, outerRim, faceInset, outerRidge, innerRidge, faceRing, hub);
           });
