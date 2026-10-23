@@ -132,12 +132,22 @@
       .hero-blob { position: absolute; inset: 16px 0 0 28px; border-radius: 50% 50% 42% 44%; background: var(--sage); animation: bloom 8s ease-in-out infinite alternate; }
       .hero-photo, .hero-3d-wrapper { position: absolute; right: 0; bottom: 0; width: 86%; height: 92%; overflow: hidden; border-radius: 46% 46% 16px 16px; box-shadow: var(--shadow); animation: glow 3.5s ease-in-out infinite alternate; }
       .hero-photo img { width: 100%; height: 100%; object-fit: cover; }
-      .hero-3d-wrapper { background: radial-gradient(circle at 50% 35%, #ffffff 0%, #edf3eb 55%, #d6e2d3 100%); border: 1px solid rgba(66, 116, 94, 0.22); cursor: grab; }
+      .hero-3d-wrapper { isolation: isolate; background: radial-gradient(circle at 47% 28%, #ffffff 0%, #f3f7f1 24%, #e4ecdf 62%, #ceddc9 100%); border: 1px solid rgba(66, 116, 94, .24); cursor: grab; touch-action: none; }
       .hero-3d-wrapper:active { cursor: grabbing; }
-      #dumbbellCanvas { width: 100%; height: 100%; display: block; }
-      .interaction-hint { position: absolute; bottom: 14px; right: 18px; display: inline-flex; align-items: center; gap: 7px; background: rgba(30, 50, 45, 0.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: #ffffff; font-size: .72rem; font-weight: 500; padding: 5px 12px; border-radius: 999px; pointer-events: none; transition: opacity .3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+      .hero-3d-wrapper::before, .hero-3d-wrapper::after { position: absolute; z-index: -1; border-radius: 50%; content: ""; pointer-events: none; }
+      .hero-3d-wrapper::before { width: 250px; height: 250px; top: -82px; left: -74px; background: rgba(255,255,255,.88); filter: blur(8px); }
+      .hero-3d-wrapper::after { width: 220px; height: 220px; right: -105px; bottom: -98px; border: 1px solid rgba(66,116,94,.22); box-shadow: 0 0 0 18px rgba(66,116,94,.05), 0 0 0 44px rgba(66,116,94,.035); }
+      #dumbbellCanvas { position: relative; z-index: 0; width: 100%; height: 100%; display: block; outline: none; }
+      .interaction-hint { position: absolute; z-index: 4; right: 18px; bottom: 14px; display: inline-flex; align-items: center; gap: 7px; background: rgba(30, 50, 45, .84); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: #ffffff; font-size: .72rem; font-weight: 500; padding: 6px 12px; border-radius: 999px; pointer-events: none; transition: opacity .3s, transform .3s; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+      .hero-3d-wrapper.is-interacting .interaction-hint { opacity: 0; transform: translateY(5px); }
+      .hero-3d-wrapper.is-3d-unavailable .interaction-hint { display: none; }
       .hint-dot { width: 7px; height: 7px; background: #6ee7b7; border-radius: 50%; box-shadow: 0 0 8px #6ee7b7; animation: pulse 1.8s infinite; }
       @keyframes pulse { 0%, 100% { transform: scale(.95); opacity: .7; } 50% { transform: scale(1.2); opacity: 1; } }
+      .three-fallback { position: absolute; inset: 0; z-index: 2; display: none; place-items: center; padding: 40px; background: linear-gradient(145deg, rgba(244,248,242,.82), rgba(217,229,213,.82)); color: var(--leaf); text-align: center; }
+      .three-fallback span { display: grid; width: 65px; height: 65px; place-items: center; margin: 0 auto 13px; border-radius: 50%; background: rgba(255,253,248,.75); font-size: 1.6rem; }
+      .three-fallback strong { display: block; margin-bottom: 5px; color: var(--ink); font-family: "Playfair Display", serif; font-size: 1.35rem; font-weight: 500; }
+      .three-fallback p { margin: 0; color: var(--muted); font-size: .83rem; line-height: 1.55; }
+      .hero-3d-wrapper.is-3d-unavailable .three-fallback { display: grid; }
       .photo-label { position: absolute; left: -22px; bottom: 34px; width: 178px; padding: 17px; border-radius: 14px; background: var(--paper); box-shadow: var(--shadow); color: var(--ink); font-size: .78rem; line-height: 1.45; }
       .photo-label strong { display: block; margin-bottom: 3px; font-size: .9rem; }
       .leaf-doodle { position: absolute; top: 6px; right: 5px; color: var(--terracotta); font-family: Georgia, serif; font-size: 6rem; animation: float 5s ease-in-out infinite; }
@@ -369,12 +379,13 @@
           <div class="hero-visual reveal" id="heroVisualArea">
             <div class="hero-blob"></div>
             <div class="leaf-doodle" aria-hidden="true">❧</div>
-            <div class="hero-3d-wrapper" id="dumbbellContainer" title="Arraste ou passe o mouse para interagir com o peso 3D">
+            <div class="hero-3d-wrapper" id="dumbbellContainer" role="img" aria-label="Halter 3D interativo, símbolo de força e saúde" title="Arraste, mova o cursor ou use as setas para interagir com o halter 3D" tabindex="0">
               <canvas id="dumbbellCanvas"></canvas>
               <div class="interaction-hint">
                 <span class="hint-dot"></span>
-                <span>Passe o mouse para mover em 3D</span>
+                <span>Arraste ou mova o cursor</span>
               </div>
+              <div class="three-fallback" aria-hidden="true"><div><span>✦</span><strong>Força com propósito</strong><p>Nutrição esportiva e clínica para acompanhar a sua evolução.</p></div></div>
             </div>
             <div class="photo-label"><strong>Foco, Força & Saúde</strong>Nutrição esportiva e clínica alinhada à sua rotina e evolução.</div>
           </div>
@@ -775,26 +786,40 @@
         const canvas = document.getElementById('dumbbellCanvas');
         if (!container || !canvas) return;
 
+        let libraryAttempts = 0;
+
         function start3D() {
           if (typeof THREE === 'undefined') {
-            setTimeout(start3D, 60);
+            libraryAttempts += 1;
+            if (libraryAttempts < 80) {
+              setTimeout(start3D, 60);
+            } else {
+              container.classList.add('is-3d-unavailable');
+            }
             return;
           }
 
           // 1. Scene & Camera Setup
           const scene = new THREE.Scene();
 
-          const camera = new THREE.PerspectiveCamera(35, (container.clientWidth || 450) / (container.clientHeight || 450), 0.1, 100);
-          camera.position.set(0, 0, 8.6);
+          const camera = new THREE.PerspectiveCamera(34, (container.clientWidth || 450) / (container.clientHeight || 450), 0.1, 100);
+          camera.position.set(0, 0.1, 8.9);
 
           // WebGL Renderer
-          const renderer = new THREE.WebGLRenderer({
-            canvas: canvas,
-            antialias: true,
-            alpha: true,
-            powerPreference: 'high-performance'
-          });
-          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          let renderer;
+          try {
+            renderer = new THREE.WebGLRenderer({
+              canvas: canvas,
+              antialias: true,
+              alpha: true,
+              powerPreference: 'high-performance'
+            });
+          } catch (error) {
+            container.classList.add('is-3d-unavailable');
+            return;
+          }
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+          renderer.outputEncoding = THREE.sRGBEncoding;
 
           function updateCanvasSize() {
             const w = container.clientWidth || 450;
@@ -829,9 +854,15 @@
 
           // Cast Iron / Vulcanized Heavy Rubber Heads (Matte & Solid)
           const rubberMaterial = new THREE.MeshStandardMaterial({
-            color: 0x181a1d,
-            metalness: 0.12,
-            roughness: 0.68,
+            color: 0x171d1a,
+            metalness: 0.16,
+            roughness: 0.6,
+          });
+
+          const rubberEdgeMaterial = new THREE.MeshStandardMaterial({
+            color: 0x2a3831,
+            metalness: 0.22,
+            roughness: 0.46,
           });
 
           // Heavy-duty steel collar
@@ -843,9 +874,9 @@
 
           // Subtle clinic accent ring
           const accentMaterial = new THREE.MeshStandardMaterial({
-            color: 0x3d705c,
-            metalness: 0.75,
-            roughness: 0.28,
+            color: 0x4f9473,
+            metalness: 0.68,
+            roughness: 0.25,
           });
 
           // Ergonomic Contoured Handle (Cylinder with center grip bulge)
@@ -938,6 +969,25 @@
             endPlate.position.x = dir * 0.64;
             head.add(endPlate);
 
+            // Friso e selo verde: detalhe da identidade visual Vitta na face externa.
+            const faceRing = new THREE.Mesh(
+              new THREE.CylinderGeometry(0.84, 0.84, 0.035, 6),
+              accentMaterial
+            );
+            faceRing.rotation.z = Math.PI / 2;
+            faceRing.rotation.y = Math.PI / 6;
+            faceRing.position.x = dir * 0.69;
+            head.add(faceRing);
+
+            const faceCore = new THREE.Mesh(
+              new THREE.CylinderGeometry(0.68, 0.68, 0.045, 6),
+              rubberEdgeMaterial
+            );
+            faceCore.rotation.z = Math.PI / 2;
+            faceCore.rotation.y = Math.PI / 6;
+            faceCore.position.x = dir * 0.715;
+            head.add(faceCore);
+
             // Center steel retention bolt
             const bolt = new THREE.Mesh(
               new THREE.CylinderGeometry(0.24, 0.24, 0.08, 6),
@@ -959,7 +1009,7 @@
 
           dumbbell.rotation.set(baseRotX, baseRotY, baseRotZ);
 
-          // 3. Fixed Soft Contact Shadow on Floor
+          // 3. Soft studio shadow, always aligned with the camera.
           const shadowCanvas = document.createElement('canvas');
           shadowCanvas.width = 128;
           shadowCanvas.height = 128;
@@ -972,18 +1022,47 @@
           shadowCtx.fillRect(0, 0, 128, 128);
 
           const shadowTexture = new THREE.CanvasTexture(shadowCanvas);
-          const shadowMesh = new THREE.Mesh(
-            new THREE.PlaneGeometry(5.2, 2.9),
-            new THREE.MeshBasicMaterial({
-              map: shadowTexture,
-              transparent: true,
-              opacity: 0.82,
-              depthWrite: false
-            })
-          );
-          shadowMesh.position.set(0, -1.95, 0);
-          shadowMesh.rotation.x = -Math.PI / 2;
+          const shadowMesh = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: shadowTexture,
+            transparent: true,
+            opacity: 0.68,
+            depthWrite: false
+          }));
+          shadowMesh.position.set(0, -1.76, -0.45);
+          shadowMesh.scale.set(5.2, 1.35, 1);
           scene.add(shadowMesh);
+
+          // Camadas leves dão profundidade sem competir com o produto.
+          const halo = new THREE.Group();
+          const haloMaterial = new THREE.MeshBasicMaterial({
+            color: 0x6fa485,
+            transparent: true,
+            opacity: 0.3,
+            depthWrite: false
+          });
+          const warmHaloMaterial = new THREE.MeshBasicMaterial({
+            color: 0xd67b5d,
+            transparent: true,
+            opacity: 0.18,
+            depthWrite: false
+          });
+          const wideRing = new THREE.Mesh(new THREE.TorusGeometry(3.15, 0.025, 8, 100), haloMaterial);
+          wideRing.rotation.set(0.88, -0.32, -0.3);
+          halo.add(wideRing);
+          const smallRing = new THREE.Mesh(new THREE.TorusGeometry(2.42, 0.016, 8, 100), warmHaloMaterial);
+          smallRing.rotation.set(1.24, 0.42, 0.64);
+          halo.add(smallRing);
+          halo.position.set(-0.08, 0.03, -1.15);
+          scene.add(halo);
+
+          const particles = new THREE.Group();
+          const particleMaterial = new THREE.MeshBasicMaterial({ color: 0x4f9473, transparent: true, opacity: 0.35 });
+          [[-3.05, 1.7, -1.7, .045], [2.65, 1.25, -1.35, .03], [2.95, -.8, -1.5, .05], [-2.7, -1.35, -1.5, .025]].forEach(([x, y, z, size]) => {
+            const particle = new THREE.Mesh(new THREE.SphereGeometry(size, 12, 12), particleMaterial);
+            particle.position.set(x, y, z);
+            particles.add(particle);
+          });
+          scene.add(particles);
 
           // 4. Clean Studio Lighting
           const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
@@ -1009,7 +1088,7 @@
           rimLight.position.set(5, -4, -3);
           scene.add(rimLight);
 
-          // 5. Solid, Firm Mouse Tilt (No float/wobble - anchored in place)
+          // 5. Interação local, precisa e compatível com mouse, toque e teclado.
           let targetRotX = baseRotX;
           let targetRotY = baseRotY;
           let targetRotZ = baseRotZ;
@@ -1019,16 +1098,35 @@
           let prevPointerY = 0;
           let dragOffsetRotX = 0;
           let dragOffsetRotY = 0;
+          let targetDragOffsetRotX = 0;
+          let targetDragOffsetRotY = 0;
+          let hasInteracted = false;
+          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-          // Mouse move over the screen: tilts the dumbbell smoothly
-          window.addEventListener('pointermove', (e) => {
+          function markInteraction() {
+            if (!hasInteracted) {
+              hasInteracted = true;
+              container.classList.add('is-interacting');
+            }
+          }
+
+          function resetPose() {
+            targetRotX = baseRotX;
+            targetRotY = baseRotY;
+            targetRotZ = baseRotZ;
+            targetDragOffsetRotX = 0;
+            targetDragOffsetRotY = 0;
+          }
+
+          container.addEventListener('pointermove', (e) => {
             if (isDragging) {
               const deltaX = e.clientX - prevPointerX;
               const deltaY = e.clientY - prevPointerY;
-              dragOffsetRotY += deltaX * 0.008;
-              dragOffsetRotX += deltaY * 0.008;
+              targetDragOffsetRotY = Math.max(-1.4, Math.min(1.4, targetDragOffsetRotY + deltaX * 0.008));
+              targetDragOffsetRotX = Math.max(-.85, Math.min(.85, targetDragOffsetRotX + deltaY * 0.008));
               prevPointerX = e.clientX;
               prevPointerY = e.clientY;
+              markInteraction();
               return;
             }
 
@@ -1036,25 +1134,24 @@
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
 
-            // Normalized distance from center (-1 to 1)
-            const normX = (e.clientX - centerX) / (window.innerWidth / 2);
-            const normY = (e.clientY - centerY) / (window.innerHeight / 2);
+            const normX = (e.clientX - centerX) / (rect.width / 2);
+            const normY = (e.clientY - centerY) / (rect.height / 2);
 
-            const clampedX = Math.max(-1.1, Math.min(1.1, normX));
-            const clampedY = Math.max(-1.1, Math.min(1.1, normY));
+            const clampedX = Math.max(-1, Math.min(1, normX));
+            const clampedY = Math.max(-1, Math.min(1, normY));
 
-            // Precise, controlled 3D tilt
-            targetRotY = baseRotY + clampedX * 0.52;
-            targetRotX = baseRotX - clampedY * 0.38;
-            targetRotZ = baseRotZ + clampedX * 0.12;
+            targetRotY = baseRotY + clampedX * 0.42;
+            targetRotX = baseRotX - clampedY * 0.3;
+            targetRotZ = baseRotZ + clampedX * 0.09;
+            markInteraction();
           });
 
-          // Optional drag to rotate
           container.addEventListener('pointerdown', (e) => {
             isDragging = true;
             prevPointerX = e.clientX;
             prevPointerY = e.clientY;
             container.setPointerCapture(e.pointerId);
+            markInteraction();
           });
 
           container.addEventListener('pointerup', (e) => {
@@ -1063,26 +1160,66 @@
           });
 
           container.addEventListener('pointercancel', () => { isDragging = false; });
+          container.addEventListener('lostpointercapture', () => { isDragging = false; });
+          container.addEventListener('pointerleave', () => {
+            if (!isDragging) {
+              targetRotX = baseRotX;
+              targetRotY = baseRotY;
+              targetRotZ = baseRotZ;
+            }
+          });
+          container.addEventListener('dblclick', resetPose);
+          container.addEventListener('keydown', (e) => {
+            const delta = .16;
+            if (e.key === 'ArrowLeft') targetDragOffsetRotY -= delta;
+            else if (e.key === 'ArrowRight') targetDragOffsetRotY += delta;
+            else if (e.key === 'ArrowUp') targetDragOffsetRotX -= delta;
+            else if (e.key === 'ArrowDown') targetDragOffsetRotX += delta;
+            else if (e.key === 'Home') resetPose();
+            else return;
+            e.preventDefault();
+            markInteraction();
+          });
 
-          // 6. Snappy, Solid Render Loop (No position wobbling)
-          function renderLoop() {
-            requestAnimationFrame(renderLoop);
+          // 6. Movimento contínuo apenas enquanto o componente está em cena.
+          let animationFrame;
+          let isInView = true;
+          function renderLoop(time) {
+            if (!isInView) {
+              animationFrame = undefined;
+              return;
+            }
+            animationFrame = requestAnimationFrame(renderLoop);
 
-            // Responsive, firm damping (0.08 = solid and immediate, not rubbery)
-            const lerpSpeed = 0.08;
+            const lerpSpeed = prefersReducedMotion ? 0.16 : 0.1;
+            dragOffsetRotX += (targetDragOffsetRotX - dragOffsetRotX) * lerpSpeed;
+            dragOffsetRotY += (targetDragOffsetRotY - dragOffsetRotY) * lerpSpeed;
             dumbbell.rotation.x += (targetRotX + dragOffsetRotX - dumbbell.rotation.x) * lerpSpeed;
             dumbbell.rotation.y += (targetRotY + dragOffsetRotY - dumbbell.rotation.y) * lerpSpeed;
             dumbbell.rotation.z += (targetRotZ - dumbbell.rotation.z) * lerpSpeed;
-
-            // Position remains solidly fixed at (0, 0, 0)
             dumbbell.position.set(0, 0, 0);
+
+            if (!prefersReducedMotion) {
+              halo.rotation.z = Math.sin(time * 0.00022) * 0.08;
+              halo.rotation.y = Math.cos(time * 0.00017) * 0.055;
+              particles.rotation.z = time * 0.00009;
+            }
 
             renderer.render(scene, camera);
           }
-          renderLoop();
+          renderLoop(performance.now());
 
-          // 7. Responsive Resize Listeners
+          const sceneVisibilityObserver = new IntersectionObserver((entries) => {
+            isInView = entries[0].isIntersecting;
+            if (isInView && !animationFrame) renderLoop(performance.now());
+          }, { threshold: .08 });
+          sceneVisibilityObserver.observe(container);
+
+          // 7. ResizeObserver acompanha o card, inclusive depois da tela de entrada.
           window.addEventListener('resize', updateCanvasSize);
+          if ('ResizeObserver' in window) {
+            new ResizeObserver(updateCanvasSize).observe(container);
+          }
           setTimeout(updateCanvasSize, 100);
           setTimeout(updateCanvasSize, 500);
         }
