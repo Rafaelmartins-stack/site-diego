@@ -320,7 +320,7 @@
           <label>Senha<input id="staff-password" type="password" autocomplete="current-password" required placeholder="Sua senha" /></label>
           <button class="btn btn-primary" type="submit">Entrar como funcionário <span class="arrow">→</span></button>
           <p class="access-feedback" id="access-feedback" aria-live="polite"></p>
-          <p class="access-disclaimer">Demonstração local: em um site publicado, o acesso deve ser validado em um servidor seguro.</p>
+          <p class="access-disclaimer">Acesso protegido pelo Supabase. Entre com uma conta de funcionário criada em Authentication.</p>
         </form>
       </div>
     </section>
@@ -344,7 +344,7 @@
       <div class="container">
         <p class="eyebrow">Modo funcionário</p>
         <h2>Atualize as informações da clínica.</h2>
-        <p class="intro-copy">As alterações deste painel aparecem na hora no site e ficam salvas neste navegador. Ao sair e entrar como cliente, a versão atualizada continuará visível.</p>
+        <p class="intro-copy">As alterações deste painel são salvas no banco e aparecem na hora para todas as pessoas que estiverem no site.</p>
         <form id="staff-editor">
           <div class="editor-grid">
             <label class="staff-field">Endereço da clínica<input id="edit-address" type="text" required /></label>
@@ -356,7 +356,7 @@
             <label class="staff-field full">URL da foto do profissional (opcional)<input id="edit-photo-url" type="text" inputmode="url" placeholder="https://exemplo.com/foto.jpg" /></label>
             <div class="photo-editor">
               <img id="editor-photo-preview" src="assets/dr-diego.png" alt="Prévia da foto do profissional" />
-              <label>Ou envie uma nova foto do computador<input id="edit-photo-file" type="file" accept="image/png,image/jpeg,image/webp" /><small>A imagem escolhida fica salva apenas neste navegador. Use arquivos de até 3 MB.</small></label>
+              <label>Ou envie uma nova foto do computador<input id="edit-photo-file" type="file" accept="image/png,image/jpeg,image/webp" /><small>A foto será salva no banco e sincronizada com o site. Para manter o carregamento leve, use arquivos de até 1 MB.</small></label>
             </div>
           </div>
           <div class="editor-bottom"><p class="editor-feedback" id="editor-feedback" aria-live="polite"></p><button class="btn btn-primary" type="submit">Salvar alterações <span class="arrow">→</span></button></div>
@@ -573,6 +573,7 @@
 
     <div class="staff-status" id="staff-status" aria-live="polite">Modo equipe ativo <button id="logout-button" type="button">Sair</button></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
       const openingScreen = document.getElementById('opening-screen');
       const accessScreen = document.getElementById('access-screen');
@@ -581,9 +582,11 @@
       const feedback = document.getElementById('access-feedback');
       const staffEmail = document.getElementById('staff-email');
       const staffPassword = document.getElementById('staff-password');
-      const staffEmailAllowed = 'familiarafael00@gmail.com';
-      const staffPasswordAllowed = '123456789';
-      const contentStorageKey = 'vitta-clinica-conteudo-v1';
+      const supabaseUrl = 'https://mxuzetneqbcdgybwfqwj.supabase.co';
+      const supabasePublishableKey = 'sb_publishable_WdsXtYNvFvs-aqySTHFKTA_FFRPw9jq';
+      const supabaseClient = window.supabase?.createClient
+        ? window.supabase.createClient(supabaseUrl, supabasePublishableKey)
+        : null;
       const defaultClinicContent = {
         address: 'Rua Professor José de Souza, 227',
         instagram: '@diego.iamato',
@@ -599,15 +602,6 @@
       const photoFileInput = document.getElementById('edit-photo-file');
       const photoUrlInput = document.getElementById('edit-photo-url');
       let pendingPhotoDataUrl = '';
-
-      function loadClinicContent() {
-        try {
-          const savedContent = JSON.parse(localStorage.getItem(contentStorageKey));
-          return savedContent ? { ...defaultClinicContent, ...savedContent } : { ...defaultClinicContent };
-        } catch (error) {
-          return { ...defaultClinicContent };
-        }
-      }
 
       function normalizeInstagram(value) {
         const withoutUrl = value.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').split('/')[0].replace(/^@/, '');
@@ -650,8 +644,81 @@
         populateEditor(content);
       }
 
-      let clinicContent = loadClinicContent();
+      function recordToClinicContent(record) {
+        return {
+          address: record.address,
+          instagram: record.instagram,
+          professionalName: record.professional_name,
+          professionalRole: record.professional_role,
+          professionalDescription: record.professional_description,
+          professionalPhoto: record.professional_photo,
+          appointmentMessage: record.appointment_message
+        };
+      }
+
+      function clinicContentToRecord(content) {
+        return {
+          address: content.address,
+          instagram: content.instagram,
+          professional_name: content.professionalName,
+          professional_role: content.professionalRole,
+          professional_description: content.professionalDescription,
+          professional_photo: content.professionalPhoto,
+          appointment_message: content.appointmentMessage,
+          updated_at: new Date().toISOString()
+        };
+      }
+
+      let clinicContent = { ...defaultClinicContent };
       applyClinicContent(clinicContent);
+
+      async function loadClinicContentFromSupabase() {
+        if (!supabaseClient) {
+          console.error('Não foi possível carregar o Supabase.');
+          return;
+        }
+        const { data, error } = await supabaseClient
+          .from('clinic_content')
+          .select('*')
+          .eq('id', 1)
+          .maybeSingle();
+        if (error) {
+          console.error('Erro ao buscar o conteúdo da clínica:', error);
+          return;
+        }
+        if (data) {
+          clinicContent = recordToClinicContent(data);
+          applyClinicContent(clinicContent);
+        }
+      }
+
+      function subscribeToClinicContent() {
+        if (!supabaseClient) return;
+        supabaseClient
+          .channel('clinic-content-live')
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'clinic_content',
+            filter: 'id=eq.1'
+          }, (payload) => {
+            clinicContent = recordToClinicContent(payload.new);
+            pendingPhotoDataUrl = '';
+            photoFileInput.value = '';
+            applyClinicContent(clinicContent);
+            if (document.body.classList.contains('staff-mode')) {
+              editorFeedback.textContent = 'Conteúdo atualizado em tempo real.';
+            }
+          })
+          .subscribe((status, error) => {
+            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+              console.error('A sincronização em tempo real não foi iniciada:', error);
+            }
+          });
+      }
+
+      loadClinicContentFromSupabase();
+      subscribeToClinicContent();
 
       function grantAccess(mode) {
         accessScreen.classList.add('is-hidden');
@@ -678,22 +745,44 @@
       }, 1450);
 
       document.getElementById('client-entry').addEventListener('click', () => grantAccess('client'));
-      document.getElementById('employee-entry').addEventListener('click', () => {
+      document.getElementById('employee-entry').addEventListener('click', async () => {
         roleSelect.hidden = true;
-        staffLogin.hidden = false;
-        staffEmail.focus();
+        if (!supabaseClient) {
+          staffLogin.hidden = false;
+          feedback.textContent = 'Não foi possível conectar ao serviço de acesso. Atualize a página e tente novamente.';
+          staffEmail.focus();
+          return;
+        }
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+          grantAccess('staff');
+        } else {
+          staffLogin.hidden = false;
+          staffEmail.focus();
+        }
       });
       document.getElementById('back-to-roles').addEventListener('click', showRoleChoices);
-      staffLogin.addEventListener('submit', (event) => {
+      staffLogin.addEventListener('submit', async (event) => {
         event.preventDefault();
-        if (staffEmail.value.trim().toLowerCase() === staffEmailAllowed && staffPassword.value === staffPasswordAllowed) {
+        if (!supabaseClient) {
+          feedback.textContent = 'Não foi possível conectar ao serviço de acesso. Atualize a página e tente novamente.';
+          return;
+        }
+        feedback.textContent = 'Entrando…';
+        const { error } = await supabaseClient.auth.signInWithPassword({
+          email: staffEmail.value.trim(),
+          password: staffPassword.value
+        });
+        if (!error) {
           grantAccess('staff');
+          await loadClinicContentFromSupabase();
           return;
         }
         feedback.textContent = 'E-mail ou senha não conferem. Verifique os dados e tente novamente.';
         staffPassword.focus();
       });
-      document.getElementById('logout-button').addEventListener('click', () => {
+      document.getElementById('logout-button').addEventListener('click', async () => {
+        if (supabaseClient) await supabaseClient.auth.signOut();
         document.body.classList.remove('staff-mode');
         document.body.classList.add('access-gated');
         accessScreen.classList.remove('is-hidden');
@@ -709,8 +798,8 @@
       photoFileInput.addEventListener('change', () => {
         const file = photoFileInput.files[0];
         if (!file) return;
-        if (file.size > 3 * 1024 * 1024) {
-          editorFeedback.textContent = 'Escolha uma imagem de até 3 MB para salvar neste navegador.';
+        if (file.size > 1024 * 1024) {
+          editorFeedback.textContent = 'Escolha uma imagem de até 1 MB para manter a sincronização rápida.';
           photoFileInput.value = '';
           return;
         }
@@ -722,8 +811,12 @@
         });
         reader.readAsDataURL(file);
       });
-      staffEditor.addEventListener('submit', (event) => {
+      staffEditor.addEventListener('submit', async (event) => {
         event.preventDefault();
+        if (!supabaseClient) {
+          editorFeedback.textContent = 'Não foi possível conectar ao banco de dados. Atualize a página e tente novamente.';
+          return;
+        }
         const nextContent = {
           address: document.getElementById('edit-address').value.trim(),
           instagram: normalizeInstagram(document.getElementById('edit-instagram').value),
@@ -733,18 +826,23 @@
           professionalPhoto: pendingPhotoDataUrl || photoUrlInput.value.trim() || clinicContent.professionalPhoto,
           appointmentMessage: document.getElementById('edit-appointment-message').value.trim()
         };
-        try {
-          localStorage.setItem(contentStorageKey, JSON.stringify(nextContent));
-          clinicContent = nextContent;
-          pendingPhotoDataUrl = '';
-          photoFileInput.value = '';
-          applyClinicContent(clinicContent);
-          editorFeedback.textContent = 'Alterações salvas. A versão de cliente já mostra estes novos dados.';
-        } catch (error) {
-          clinicContent = nextContent;
-          applyClinicContent(clinicContent);
-          editorFeedback.textContent = 'Alterações aplicadas nesta sessão. Para persistir depois de fechar o navegador, use uma URL de foto menor ou publique o site com um banco de dados.';
+        editorFeedback.textContent = 'Salvando e sincronizando…';
+        const { data, error } = await supabaseClient
+          .from('clinic_content')
+          .update(clinicContentToRecord(nextContent))
+          .eq('id', 1)
+          .select()
+          .single();
+        if (error) {
+          console.error('Erro ao salvar o conteúdo da clínica:', error);
+          editorFeedback.textContent = 'Não foi possível salvar. Confirme se a configuração do Supabase foi concluída.';
+          return;
         }
+        clinicContent = recordToClinicContent(data);
+        pendingPhotoDataUrl = '';
+        photoFileInput.value = '';
+        applyClinicContent(clinicContent);
+        editorFeedback.textContent = 'Alterações salvas e sincronizadas para todas as pessoas no site.';
       });
 
       const menuButton = document.getElementById('menu-button');
