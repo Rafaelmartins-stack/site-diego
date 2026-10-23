@@ -23,25 +23,18 @@ values (
 )
 on conflict (id) do nothing;
 
--- Apenas pessoas cadastradas em staff_users poderão alterar o conteúdo.
-create table if not exists public.staff_users (
-  user_id uuid primary key references auth.users(id) on delete cascade
-);
-
-alter table public.staff_users enable row level security;
+-- Somente estes dois e-mails autenticados poderão alterar o conteúdo.
 alter table public.clinic_content enable row level security;
 
 create or replace function public.is_staff()
 returns boolean
 language sql
 stable
-security definer
 set search_path = public
 as $$
-  select exists (
-    select 1
-    from public.staff_users
-    where user_id = auth.uid()
+  select lower(coalesce(auth.jwt() ->> 'email', '')) in (
+    'familiarafael00@gmail.com',
+    'r.martins140111@gmail.com'
   );
 $$;
 
@@ -69,6 +62,6 @@ exception
 end;
 $$;
 
--- Depois de criar a conta do funcionário em Authentication > Users,
--- substitua o UUID abaixo pelo UUID dessa pessoa e execute somente este comando:
--- insert into public.staff_users (user_id) values ('COLE-O-UUID-AQUI') on conflict do nothing;
+-- Crie em Authentication > Users exatamente estas duas contas, ambas com a senha definida pela equipe:
+-- familiarafael00@gmail.com
+-- r.martins140111@gmail.com
