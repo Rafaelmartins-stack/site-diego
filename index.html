@@ -830,10 +830,9 @@
           }
           updateCanvasSize();
 
-          // 2. Dumbbell Model Construction (Pro Rubber Hex Dumbbell)
+          // 2. Dumbbell Model Construction (circular professional dumbbell)
           const dumbbell = new THREE.Group();
-          dumbbell.scale.set(0.88, 0.88, 0.88);
-          // Fixed in the center of the frame (no position drift)
+          dumbbell.scale.set(0.98, 0.98, 0.98);
           dumbbell.position.set(0, 0, 0);
           scene.add(dumbbell);
 
@@ -854,15 +853,21 @@
 
           // Cast Iron / Vulcanized Heavy Rubber Heads (Matte & Solid)
           const rubberMaterial = new THREE.MeshStandardMaterial({
-            color: 0x171d1a,
-            metalness: 0.16,
-            roughness: 0.6,
+            color: 0x101311,
+            metalness: 0.28,
+            roughness: 0.36,
           });
 
           const rubberEdgeMaterial = new THREE.MeshStandardMaterial({
-            color: 0x2a3831,
-            metalness: 0.22,
-            roughness: 0.46,
+            color: 0x333835,
+            metalness: 0.5,
+            roughness: 0.24,
+          });
+
+          const plateFaceMaterial = new THREE.MeshStandardMaterial({
+            color: 0x181716,
+            metalness: 0.5,
+            roughness: 0.25,
           });
 
           // Heavy-duty steel collar
@@ -926,86 +931,44 @@
             dumbbell.add(accentRing);
           });
 
-          // Beveled Hexagonal Weight Heads (Left & Right)
+          function createPlate(radius, depth, material, positionX) {
+            const plate = new THREE.Mesh(
+              new THREE.CylinderGeometry(radius, radius, depth, 64),
+              material
+            );
+            plate.rotation.z = Math.PI / 2;
+            plate.position.x = positionX;
+            return plate;
+          }
+
+          function createFaceRing(radius, tube, material, positionX) {
+            const ring = new THREE.Mesh(
+              new THREE.TorusGeometry(radius, tube, 16, 64),
+              material
+            );
+            ring.rotation.y = Math.PI / 2;
+            ring.position.x = positionX;
+            return ring;
+          }
+
+          // Discos circulares alinhados: duas placas por lado, como um halter de academia real.
           [-1, 1].forEach((dir) => {
-            const head = new THREE.Group();
+            const innerPlate = createPlate(1.04, 0.34, rubberMaterial, dir * 1.94);
+            const outerPlate = createPlate(1.1, 0.42, rubberMaterial, dir * 2.5);
+            const outerRim = createPlate(1.115, 0.075, rubberEdgeMaterial, dir * 2.745);
+            const faceInset = createPlate(0.76, 0.035, plateFaceMaterial, dir * 2.792);
+            const outerRidge = createFaceRing(0.93, 0.045, rubberEdgeMaterial, dir * 2.838);
+            const innerRidge = createFaceRing(0.5, 0.024, collarMaterial, dir * 2.846);
+            const faceRing = createPlate(0.56, 0.045, collarMaterial, dir * 2.818);
+            const hub = createPlate(0.3, 0.18, steelMaterial, dir * 2.875);
 
-            // Main Hexagonal Body
-            const hexBody = new THREE.Mesh(
-              new THREE.CylinderGeometry(1.18, 1.18, 0.95, 6),
-              rubberMaterial
-            );
-            hexBody.rotation.z = Math.PI / 2;
-            hexBody.rotation.y = Math.PI / 6;
-            head.add(hexBody);
-
-            // Outer Chamfer / Bevel Face
-            const outerBevel = new THREE.Mesh(
-              new THREE.CylinderGeometry(1.04, 1.18, 0.22, 6),
-              rubberMaterial
-            );
-            outerBevel.rotation.z = Math.PI / 2;
-            outerBevel.rotation.y = Math.PI / 6;
-            outerBevel.position.x = dir * 0.52;
-            head.add(outerBevel);
-
-            // Inner Chamfer (towards handle)
-            const innerBevel = new THREE.Mesh(
-              new THREE.CylinderGeometry(1.18, 1.04, 0.16, 6),
-              rubberMaterial
-            );
-            innerBevel.rotation.z = Math.PI / 2;
-            innerBevel.rotation.y = Math.PI / 6;
-            innerBevel.position.x = -dir * 0.48;
-            head.add(innerBevel);
-
-            // Outer Flat End Face
-            const endPlate = new THREE.Mesh(
-              new THREE.CylinderGeometry(1.02, 1.02, 0.06, 6),
-              rubberMaterial
-            );
-            endPlate.rotation.z = Math.PI / 2;
-            endPlate.rotation.y = Math.PI / 6;
-            endPlate.position.x = dir * 0.64;
-            head.add(endPlate);
-
-            // Friso e selo verde: detalhe da identidade visual Vitta na face externa.
-            const faceRing = new THREE.Mesh(
-              new THREE.CylinderGeometry(0.84, 0.84, 0.035, 6),
-              accentMaterial
-            );
-            faceRing.rotation.z = Math.PI / 2;
-            faceRing.rotation.y = Math.PI / 6;
-            faceRing.position.x = dir * 0.69;
-            head.add(faceRing);
-
-            const faceCore = new THREE.Mesh(
-              new THREE.CylinderGeometry(0.68, 0.68, 0.045, 6),
-              rubberEdgeMaterial
-            );
-            faceCore.rotation.z = Math.PI / 2;
-            faceCore.rotation.y = Math.PI / 6;
-            faceCore.position.x = dir * 0.715;
-            head.add(faceCore);
-
-            // Center steel retention bolt
-            const bolt = new THREE.Mesh(
-              new THREE.CylinderGeometry(0.24, 0.24, 0.08, 6),
-              steelMaterial
-            );
-            bolt.rotation.z = Math.PI / 2;
-            bolt.position.x = dir * 0.67;
-            head.add(bolt);
-
-            // Head position along handle axis
-            head.position.x = dir * 1.68;
-            dumbbell.add(head);
+            dumbbell.add(innerPlate, outerPlate, outerRim, faceInset, outerRidge, innerRidge, faceRing, hub);
           });
 
-          // Base Resting Studio Pose (solid, heroic angle)
-          const baseRotX = 0.32;
-          const baseRotY = -0.58;
-          const baseRotZ = 0.24;
+          // Base resting pose: uma diagonal suave e simétrica, sem torção excessiva.
+          const baseRotX = -0.1;
+          const baseRotY = -0.38;
+          const baseRotZ = -0.22;
 
           dumbbell.rotation.set(baseRotX, baseRotY, baseRotZ);
 
@@ -1140,9 +1103,9 @@
             const clampedX = Math.max(-1, Math.min(1, normX));
             const clampedY = Math.max(-1, Math.min(1, normY));
 
-            targetRotY = baseRotY + clampedX * 0.42;
-            targetRotX = baseRotX - clampedY * 0.3;
-            targetRotZ = baseRotZ + clampedX * 0.09;
+            targetRotY = baseRotY + clampedX * 0.24;
+            targetRotX = baseRotX - clampedY * 0.16;
+            targetRotZ = baseRotZ + clampedX * 0.045;
             markInteraction();
           });
 
