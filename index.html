@@ -328,7 +328,7 @@
           <button class="back-button" id="back-to-roles" type="button">← Voltar para perfis</button>
           <p class="eyebrow">Área da equipe</p>
           <h1>Identificação de funcionário.</h1>
-          <p>Use as credenciais da equipe para liberar o acesso demonstrativo.</p>
+          <p>Digite o e-mail e a senha da conta de funcionário que deseja usar.</p>
           <label>E-mail da equipe<input id="staff-email" type="email" autocomplete="email" required placeholder="nome@exemplo.com" /></label>
           <label>Senha<input id="staff-password" type="password" autocomplete="current-password" required placeholder="Sua senha" /></label>
           <button class="btn btn-primary" type="submit">Entrar como funcionário <span class="arrow">→</span></button>
@@ -862,21 +862,12 @@
       }, 1450);
 
       document.getElementById('client-entry').addEventListener('click', () => grantAccess('client'));
-      document.getElementById('employee-entry').addEventListener('click', async () => {
+      document.getElementById('employee-entry').addEventListener('click', () => {
         roleSelect.hidden = true;
-        if (!supabaseClient) {
-          staffLogin.hidden = false;
-          feedback.textContent = 'Não foi possível conectar ao serviço de acesso. Atualize a página e tente novamente.';
-          staffEmail.focus();
-          return;
-        }
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-          grantAccess('staff');
-        } else {
-          staffLogin.hidden = false;
-          staffEmail.focus();
-        }
+        staffLogin.hidden = false;
+        feedback.textContent = 'Escolha a conta de funcionário informando o e-mail e a senha abaixo.';
+        staffLogin.reset();
+        staffEmail.focus();
       });
       document.getElementById('back-to-roles').addEventListener('click', showRoleChoices);
       staffLogin.addEventListener('submit', async (event) => {
