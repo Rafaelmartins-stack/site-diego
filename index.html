@@ -205,10 +205,10 @@
       .team-top { max-width: 610px; margin-bottom: 42px; }
       .team-top h2 { margin-bottom: 15px; }
       .team-top .copy { margin: 0; }
-      .team-grid.team-profile { grid-template-columns: minmax(320px, 430px) minmax(400px, 1fr); align-items: center; gap: clamp(40px, 5vw, 76px); }
-      .team-story-panel { padding: 10px 0; }
+      .team-grid.team-profile { grid-template-columns: minmax(320px, 430px) minmax(320px, 430px); align-items: start; justify-content: start; gap: clamp(40px, 5vw, 76px); }
+      .team-story-panel { display: flex; aspect-ratio: 1 / 1.15; flex-direction: column; justify-content: center; padding: clamp(30px, 4vw, 48px); border-radius: 16px; background: #eee8da; }
       .team-story-panel .eyebrow { margin-bottom: 14px; }
-      .team-story { max-width: 620px; margin: 0; color: #675f52; font-size: 1.08rem; line-height: 1.85; }
+      .team-story { margin: 0; color: #675f52; font-size: 1.05rem; line-height: 1.82; }
       .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
       .team-grid.single { grid-template-columns: minmax(250px, 365px); }
       .team-grid.duo { grid-template-columns: repeat(2, minmax(250px, 365px)); }
@@ -299,7 +299,7 @@
         .team-grid.team-profile { grid-template-columns: 1fr; gap: 24px; }
         .team-profile .person { display: contents; }
         .team-profile .person-photo { order: 1; max-width: 360px; margin-bottom: 0; }
-        .team-profile .team-story-panel { order: 2; max-width: 560px; padding: 0; }
+        .team-profile .team-story-panel { order: 2; max-width: 560px; aspect-ratio: auto; padding: 28px; }
         .team-profile .person-details { order: 3; max-width: 360px; }
       }
       @media (max-width: 520px) {
