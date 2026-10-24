@@ -1081,7 +1081,7 @@
 
           // 2. Dumbbell Model Construction (circular professional dumbbell)
           const dumbbell = new THREE.Group();
-          dumbbell.scale.set(0.87, 0.87, 0.87);
+          dumbbell.scale.set(0.70, 0.70, 0.70);
           dumbbell.position.set(0, 0, 0);
           scene.add(dumbbell);
 
@@ -1135,7 +1135,7 @@
 
           // Ergonomic contoured handle: it reaches the collars so the object reads as one solid dumbbell.
           const handleBar = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.22, 0.22, 2.8, 32),
+            new THREE.CylinderGeometry(0.22, 0.22, 2.6, 32),
             steelMaterial
           );
           handleBar.rotation.z = Math.PI / 2;
@@ -1213,7 +1213,7 @@
             hub: 2.8
           };
           [-1, 1].forEach((dir) => {
-            const smallWeightPlate = createPlate(0.76, 0.39, rubberEdgeMaterial, dir * stack.smallPlate);
+            const smallWeightPlate = createPlate(0.76, 0.42, rubberEdgeMaterial, dir * stack.smallPlate);
             const solidWeightBody = createPlate(1.1, 0.84, rubberMaterial, dir * stack.body);
             const outerCap = createPlate(1.115, 0.12, rubberEdgeMaterial, dir * stack.cap);
             const faceInset = createPlate(0.76, 0.035, plateFaceMaterial, dir * stack.face);
