@@ -103,6 +103,14 @@
       .editor-bottom .btn { background: var(--terracotta); }
       .editor-bottom .btn:hover { background: #d7bd78; }
       .editor-feedback { min-height: 20px; margin: 0; color: #d7bd78; font-size: .83rem; line-height: 1.45; }
+      .inline-editor-hint { grid-column: 1 / -1; margin: 0; padding: 15px 17px; border: 1px solid rgba(215, 189, 120, .45); border-radius: 12px; background: rgba(255, 250, 240, .06); color: #eee4d2; font-size: .88rem; line-height: 1.55; }
+      .inline-editor-hint strong { color: #fffaf0; }
+      body.staff-mode [data-inline-text], body.staff-mode [data-inline-field] { position: relative; cursor: text; outline: 1px dashed rgba(170, 138, 76, .72); outline-offset: 4px; border-radius: 3px; transition: outline-color .18s, background .18s; }
+      body.staff-mode [data-inline-text]:hover, body.staff-mode [data-inline-field]:hover { outline-color: var(--terracotta); background: rgba(255, 253, 248, .45); }
+      body.staff-mode [data-inline-text]:focus, body.staff-mode [data-inline-field]:focus { outline: 2px solid var(--terracotta); outline-offset: 5px; background: rgba(255, 253, 248, .72); }
+      body.staff-mode img[data-site-image], body.staff-mode img[data-professional-photo] { cursor: pointer; outline: 2px dashed rgba(170, 138, 76, .78); outline-offset: -7px; filter: brightness(.96); transition: filter .2s, outline-color .2s; }
+      body.staff-mode img[data-site-image]:hover, body.staff-mode img[data-professional-photo]:hover { outline-color: var(--terracotta); filter: brightness(1.04); }
+      .inline-image-input { display: none; }
       .photo-editors { grid-column: 1 / -1; }
       .photo-editor-heading { margin: 0 0 11px; color: #fffaf0; font-size: .9rem; font-weight: 700; }
       .image-editor-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
@@ -356,43 +364,16 @@
     <section class="staff-dashboard" id="staff-dashboard" aria-label="Painel de edição da clínica">
       <div class="container">
         <p class="eyebrow">Modo funcionário</p>
-        <h2>Atualize as informações da clínica.</h2>
-        <p class="intro-copy">As alterações deste painel são salvas no banco e aparecem na hora para todas as pessoas que estiverem no site.</p>
+        <h2>Atualize a clínica direto na página.</h2>
+        <p class="intro-copy">Clique em um texto para escrevê-lo ali mesmo. Para trocar uma foto, clique nela e escolha o arquivo. Mantenha aqui os dados de contato.</p>
         <form id="staff-editor">
           <div class="editor-grid">
             <label class="staff-field">Endereço da clínica<input id="edit-address" type="text" required /></label>
             <label class="staff-field">Instagram da clínica<input id="edit-instagram" type="text" required placeholder="@seu.perfil" /></label>
-            <label class="staff-field">Nome do profissional<input id="edit-professional-name" type="text" required /></label>
-            <label class="staff-field">Cargo ou registro<input id="edit-professional-role" type="text" required /></label>
-            <label class="staff-field full">Descrição do profissional<textarea id="edit-professional-description" required></textarea></label>
-            <label class="staff-field full">Mensagem de apresentação do agendamento<textarea id="edit-appointment-message" required></textarea></label>
-            <div class="photo-editors">
-              <p class="photo-editor-heading">Fotos do site</p>
-              <div class="image-editor-grid">
-                <div class="photo-editor">
-                  <img id="editor-photo-preview" src="assets/dr-diego.png" alt="Prévia da foto do Dr. Diego" />
-                  <label>Foto do Dr. Diego (equipe)<input id="edit-photo-url" type="text" inputmode="url" placeholder="Cole a URL da imagem" /><input id="edit-photo-file" type="file" accept="image/png,image/jpeg,image/webp" /><small>Envie uma imagem ou cole uma URL. Tamanho máximo: 1 MB.</small></label>
-                </div>
-                <div class="photo-editor">
-                  <img data-site-image-preview="clinic" src="assets/dr-diego.png" alt="Prévia da foto de acompanhamento" />
-                  <label>Foto de acompanhamento<input data-site-image-url="clinic" type="text" inputmode="url" placeholder="Cole a URL da imagem" /><input data-site-image-file="clinic" type="file" accept="image/png,image/jpeg,image/webp" /><small>Imagem da seção de acompanhamento.</small></label>
-                </div>
-                <div class="photo-editor">
-                  <img data-site-image-preview="consultation" src="https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Prévia da consulta individual" />
-                  <label>Foto da consulta individual<input data-site-image-url="consultation" type="text" inputmode="url" placeholder="Cole a URL da imagem" /><input data-site-image-file="consultation" type="file" accept="image/png,image/jpeg,image/webp" /><small>Imagem do primeiro serviço.</small></label>
-                </div>
-                <div class="photo-editor">
-                  <img data-site-image-preview="strategy" src="https://images.unsplash.com/photo-1579758629938-03607ccdbaba?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Prévia da estratégia personalizada" />
-                  <label>Foto da estratégia personalizada<input data-site-image-url="strategy" type="text" inputmode="url" placeholder="Cole a URL da imagem" /><input data-site-image-file="strategy" type="file" accept="image/png,image/jpeg,image/webp" /><small>Imagem do segundo serviço.</small></label>
-                </div>
-                <div class="photo-editor">
-                  <img data-site-image-preview="followup" src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Prévia do acompanhamento contínuo" />
-                  <label>Foto do acompanhamento contínuo<input data-site-image-url="followup" type="text" inputmode="url" placeholder="Cole a URL da imagem" /><input data-site-image-file="followup" type="file" accept="image/png,image/jpeg,image/webp" /><small>Imagem do terceiro serviço.</small></label>
-                </div>
-              </div>
-            </div>
+            <label class="staff-field">WhatsApp / telefone<input id="edit-phone" type="tel" inputmode="tel" required placeholder="(11) 99999-9999" /></label>
+            <p class="inline-editor-hint"><strong>Edição visual ativada.</strong> Textos e fotos destacados aparecem apenas para funcionários. Os textos e fotos da página ficam salvos automaticamente neste navegador; o endereço, Instagram e dados do profissional são sincronizados ao clicar em salvar.</p>
           </div>
-          <div class="editor-bottom"><p class="editor-feedback" id="editor-feedback" aria-live="polite"></p><button class="btn btn-primary" type="submit">Salvar alterações <span class="arrow">→</span></button></div>
+          <div class="editor-bottom"><p class="editor-feedback" id="editor-feedback" aria-live="polite"></p><button class="btn btn-primary" type="submit">Salvar dados da clínica <span class="arrow">→</span></button></div>
         </form>
       </div>
     </section>
@@ -402,7 +383,7 @@
         <div class="container hero-grid">
           <div class="reveal">
             <p class="eyebrow">Nutrição com direção</p>
-            <h1>Saúde, rotina e <em>performance</em> com leveza.</h1>
+            <h1><span data-inline-text="hero-title-start">Saúde, rotina e </span><em><span data-inline-text="hero-title-focus">performance</span></em><span data-inline-text="hero-title-end"> com leveza.</span></h1>
             <p class="copy">Com o Dr. Diego Iamato, nutrição e hábitos se tornam estratégias possíveis para você cuidar do corpo sem complicar a vida.</p>
             <div class="hero-actions">
               <a class="btn btn-primary" data-whatsapp-link href="https://wa.me/5511999822322" target="_blank" rel="noopener">Agendar uma conversa <span class="arrow">→</span></a>
@@ -502,7 +483,7 @@
           <div class="team-grid single reveal">
             <article class="person">
               <div class="person-photo"><img data-professional-photo src="assets/dr-diego.png" alt="Dr. Diego Iamato, nutricionista" /></div>
-              <h3 data-professional-name>Diego Iamato</h3><p data-professional-role>Nutricionista · CRN 00000</p><small data-professional-description>Orientação para uma alimentação mais leve, rotina ativa e objetivos possíveis para a sua saúde.</small>
+              <h3 data-professional-name data-inline-field="professionalName">Diego Iamato</h3><p data-professional-role data-inline-field="professionalRole">Nutricionista · CRN 00000</p><small data-professional-description data-inline-field="professionalDescription">Orientação para uma alimentação mais leve, rotina ativa e objetivos possíveis para a sua saúde.</small>
             </article>
           </div>
         </div>
@@ -571,7 +552,7 @@
           </div>
           <div class="whatsapp-card reveal">
             <p class="message-label">Agendamento por WhatsApp</p>
-            <p class="message-preview" data-appointment-message>Olá, bom dia! Gostaria de fazer uma consulta com o Dr. Diego Iamato.</p>
+            <p class="message-preview" data-appointment-message data-inline-field="appointmentMessage">Olá, bom dia! Gostaria de fazer uma consulta com o Dr. Diego Iamato.</p>
             <a class="btn btn-primary" data-whatsapp-link href="https://wa.me/5511999822322" target="_blank" rel="noopener">Enviar mensagem <span class="arrow">→</span></a>
             <p class="whatsapp-note">Você será direcionado ao WhatsApp para combinar seu horário.</p>
           </div>
@@ -588,7 +569,7 @@
           <div class="contact-list reveal">
             <div><strong>Endereço</strong><span data-clinic-address>Rua Professor José de Souza, 227</span></div>
             <div><strong>Modalidades</strong><span>Atendimento presencial<br />Teleconsulta por vídeo</span></div>
-            <div><strong>Contato</strong><a href="tel:+5511999822322">(11) 99982-2322</a><br /><a href="mailto:ola@clinicavitta.com.br">ola@clinicavitta.com.br</a></div>
+            <div><strong>Contato</strong><a data-phone-link href="tel:+5511999822322">(11) 99982-2322</a><br /><a href="mailto:ola@clinicavitta.com.br">ola@clinicavitta.com.br</a></div>
             <div><strong>Instagram</strong><a data-instagram-link href="https://www.instagram.com/diego.iamato/" target="_blank" rel="noopener"><span data-instagram-handle>@diego.iamato</span></a><br /><a data-whatsapp-link href="https://wa.me/5511999822322" target="_blank" rel="noopener">Agendar consulta</a></div>
           </div>
         </div>
@@ -605,6 +586,7 @@
     </footer>
 
     <div class="staff-status" id="staff-status" aria-live="polite">Modo funcionário ativo <button id="logout-button" type="button">Sair</button></div>
+    <input class="inline-image-input" id="inline-image-input" type="file" accept="image/png,image/jpeg,image/webp" />
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -631,19 +613,19 @@
       };
       const staffEditor = document.getElementById('staff-editor');
       const editorFeedback = document.getElementById('editor-feedback');
-      const editorPhotoPreview = document.getElementById('editor-photo-preview');
-      const photoFileInput = document.getElementById('edit-photo-file');
-      const photoUrlInput = document.getElementById('edit-photo-url');
+      const inlineImageInput = document.getElementById('inline-image-input');
       const localClinicContentKey = 'diego-iamoto-clinic-content-v1';
       const localSiteImagesKey = 'diego-iamoto-site-images-v1';
+      const localEditableTextKey = 'diego-iamato-inline-text-v1';
+      const localContactSettingsKey = 'diego-iamato-contact-settings-v1';
+      const defaultContactSettings = { phone: '5511999822322' };
       const siteImageDefaults = {
         clinic: 'assets/dr-diego.png',
         consultation: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=85',
         strategy: 'https://images.unsplash.com/photo-1579758629938-03607ccdbaba?auto=format&fit=crop&w=900&q=85',
         followup: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=900&q=85'
       };
-      let pendingPhotoDataUrl = '';
-      const pendingSiteImageData = {};
+      let inlineImageTarget = '';
       let hasLocalClinicChanges = false;
 
       function readLocalObject(key) {
@@ -675,6 +657,8 @@
       }
 
       let siteImages = loadSiteImages();
+      let editableTextContent = readLocalObject(localEditableTextKey);
+      let contactSettings = { ...defaultContactSettings, ...readLocalObject(localContactSettingsKey) };
 
       function normalizeInstagram(value) {
         const withoutUrl = value.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').split('/')[0].replace(/^@/, '');
@@ -685,8 +669,21 @@
         return `https://www.instagram.com/${handle.replace(/^@/, '')}/`;
       }
 
+      function normalizePhone(value) {
+        const digits = String(value || '').replace(/\D/g, '');
+        if (digits.length === 10 || digits.length === 11) return `55${digits}`;
+        return digits;
+      }
+
+      function formatPhone(value) {
+        const phone = normalizePhone(value).replace(/^55/, '');
+        if (phone.length === 11) return `(${phone.slice(0, 2)}) ${phone.slice(2, 7)}-${phone.slice(7)}`;
+        if (phone.length === 10) return `(${phone.slice(0, 2)}) ${phone.slice(2, 6)}-${phone.slice(6)}`;
+        return value || '';
+      }
+
       function appointmentUrl(message) {
-        return `https://wa.me/5511999822322?text=${encodeURIComponent(message)}`;
+        return `https://wa.me/${normalizePhone(contactSettings.phone)}?text=${encodeURIComponent(message)}`;
       }
 
       function correctLegacyName(value) {
@@ -704,13 +701,7 @@
       function populateEditor(content) {
         document.getElementById('edit-address').value = content.address;
         document.getElementById('edit-instagram').value = content.instagram;
-        document.getElementById('edit-professional-name').value = content.professionalName;
-        document.getElementById('edit-professional-role').value = content.professionalRole;
-        document.getElementById('edit-professional-description').value = content.professionalDescription;
-        document.getElementById('edit-appointment-message').value = content.appointmentMessage;
-        photoUrlInput.value = /^(data:|assets\/)/.test(content.professionalPhoto) ? '' : content.professionalPhoto;
-        editorPhotoPreview.src = content.professionalPhoto;
-        populateSiteImageEditors();
+        document.getElementById('edit-phone').value = formatPhone(contactSettings.phone);
       }
 
       function applySiteImages(images) {
@@ -718,18 +709,6 @@
           const source = images[element.dataset.siteImage];
           if (source) element.src = source;
         });
-        document.querySelectorAll('[data-site-image-preview]').forEach((element) => {
-          const source = images[element.dataset.siteImagePreview];
-          if (source) element.src = source;
-        });
-      }
-
-      function populateSiteImageEditors() {
-        document.querySelectorAll('[data-site-image-url]').forEach((input) => {
-          const source = siteImages[input.dataset.siteImageUrl] || '';
-          input.value = source.startsWith('data:') ? '' : source;
-        });
-        applySiteImages(siteImages);
       }
 
       function applyClinicContent(content) {
@@ -749,6 +728,17 @@
         populateEditor(content);
       }
 
+      function applyContactSettings() {
+        const phone = normalizePhone(contactSettings.phone);
+        document.querySelectorAll('[data-phone-link]').forEach((element) => {
+          element.href = `tel:+${phone}`;
+          element.textContent = formatPhone(phone);
+        });
+        document.querySelectorAll('[data-whatsapp-link]').forEach((element) => {
+          element.href = appointmentUrl(clinicContent.appointmentMessage);
+        });
+      }
+
       function recordToClinicContent(record) {
         return normalizeClinicContent({
           address: record.address,
@@ -764,7 +754,7 @@
       function isCurrentBrandContent(content) {
         const name = (content.professionalName || '').toLowerCase();
         const instagram = (content.instagram || '').toLowerCase();
-        return name.includes('diego') && instagram === '@diego.iamato' && !name.includes('rafael');
+        return name.includes('diego') && instagram.startsWith('@') && !name.includes('rafael');
       }
 
       function clinicContentToRecord(content) {
@@ -791,8 +781,129 @@
       }
 
       let clinicContent = { ...defaultClinicContent, ...loadLocalClinicContent() };
+
+      function getInlineTextElements() {
+        const selector = [
+          'main h2', 'main h3', 'main p', 'main blockquote', 'main small',
+          'main .fact strong', 'main .fact span', 'main .value strong', 'main .value span',
+          'main [data-inline-text]'
+        ].join(',');
+        return [...document.querySelectorAll(selector)].filter((element) => {
+          if (element.closest('.hero-3d-wrapper') || element.closest('.post-grid')) return false;
+          if (element.closest('[aria-hidden="true"]')) return false;
+          return !element.matches('[data-clinic-address], [data-instagram-handle], [data-appointment-message], [data-professional-name], [data-professional-role], [data-professional-description], [data-inline-field]');
+        });
+      }
+
+      function syncReviewClone(source, value) {
+        const card = source.closest('.review-card');
+        if (!card || card.getAttribute('aria-hidden') === 'true') return;
+        const visibleCards = [...document.querySelectorAll('.review-card:not([aria-hidden="true"])')];
+        const copyCards = [...document.querySelectorAll('.review-card[aria-hidden="true"]')];
+        const copy = copyCards[visibleCards.indexOf(card)];
+        const matchingElement = copy?.querySelector(source.tagName.toLowerCase());
+        if (matchingElement && matchingElement !== source) matchingElement.textContent = value;
+      }
+
+      function configureInlineTextEditing() {
+        getInlineTextElements().forEach((element, index) => {
+          const key = element.dataset.inlineText || `page-copy-${index + 1}`;
+          element.dataset.inlineText = key;
+          const savedValue = editableTextContent[key];
+          if (typeof savedValue === 'string') {
+            element.textContent = savedValue;
+            syncReviewClone(element, savedValue);
+          }
+          element.contentEditable = 'false';
+          element.spellcheck = false;
+          element.addEventListener('input', () => {
+            if (!document.body.classList.contains('staff-mode')) return;
+            const value = element.textContent.replace(/\s+/g, ' ').trim();
+            editableTextContent[key] = value;
+            document.querySelectorAll(`[data-inline-text="${key}"]`).forEach((target) => {
+              if (target !== element) target.textContent = value;
+            });
+            syncReviewClone(element, value);
+            const saved = writeLocalObject(localEditableTextKey, editableTextContent);
+            editorFeedback.textContent = saved
+              ? 'Texto salvo neste navegador.'
+              : 'Não foi possível salvar este texto neste navegador.';
+          });
+        });
+      }
+
+      function configureInlineClinicFields() {
+        document.querySelectorAll('[data-inline-field]').forEach((element) => {
+          element.contentEditable = 'false';
+          element.spellcheck = false;
+          element.addEventListener('input', () => {
+            if (!document.body.classList.contains('staff-mode')) return;
+            const value = element.textContent.replace(/\s+/g, ' ').trim();
+            clinicContent = { ...clinicContent, [element.dataset.inlineField]: value };
+            if (element.dataset.inlineField === 'appointmentMessage') {
+              document.querySelectorAll('[data-whatsapp-link]').forEach((link) => { link.href = appointmentUrl(value); });
+            }
+            editorFeedback.textContent = 'Dado da clínica alterado. Clique em “Salvar dados da clínica” para sincronizar.';
+          });
+        });
+      }
+
+      function setInlineEditing(enabled) {
+        document.querySelectorAll('[data-inline-text], [data-inline-field]').forEach((element) => {
+          element.contentEditable = enabled ? 'true' : 'false';
+          element.spellcheck = enabled;
+        });
+      }
+
+      function configureInlineImageEditing() {
+        document.querySelectorAll('img[data-site-image], img[data-professional-photo]').forEach((image) => {
+          image.title = 'Clique para trocar esta foto';
+          image.addEventListener('click', (event) => {
+            if (!document.body.classList.contains('staff-mode')) return;
+            event.preventDefault();
+            inlineImageTarget = image.hasAttribute('data-professional-photo')
+              ? 'professionalPhoto'
+              : image.dataset.siteImage;
+            inlineImageInput.value = '';
+            inlineImageInput.click();
+          });
+        });
+
+        inlineImageInput.addEventListener('change', () => {
+          const file = inlineImageInput.files[0];
+          if (!file || !inlineImageTarget) return;
+          if (file.size > 1024 * 1024) {
+            editorFeedback.textContent = 'Escolha uma imagem de até 1 MB.';
+            inlineImageInput.value = '';
+            return;
+          }
+          const target = inlineImageTarget;
+          const reader = new FileReader();
+          reader.addEventListener('load', () => {
+            const source = String(reader.result);
+            if (target === 'professionalPhoto') {
+              clinicContent = { ...clinicContent, professionalPhoto: source };
+              applyClinicContent(clinicContent);
+              editorFeedback.textContent = 'Foto do profissional atualizada. Clique em “Salvar dados da clínica” para sincronizar.';
+            } else {
+              siteImages = { ...siteImages, [target]: source };
+              applySiteImages(siteImages);
+              editorFeedback.textContent = writeLocalObject(localSiteImagesKey, siteImages)
+                ? 'Foto atualizada e salva neste navegador.'
+                : 'A foto foi atualizada, mas não pôde ser salva neste navegador.';
+            }
+            inlineImageTarget = '';
+          });
+          reader.readAsDataURL(file);
+        });
+      }
+
       applyClinicContent(clinicContent);
+      applyContactSettings();
       applySiteImages(siteImages);
+      configureInlineTextEditing();
+      configureInlineClinicFields();
+      configureInlineImageEditing();
 
       async function loadClinicContentFromSupabase() {
         if (!supabaseClient) {
@@ -830,8 +941,6 @@
             const incomingContent = recordToClinicContent(payload.new);
             if (!hasLocalClinicChanges && isCurrentBrandContent(incomingContent)) {
               clinicContent = incomingContent;
-              pendingPhotoDataUrl = '';
-              photoFileInput.value = '';
               applyClinicContent(clinicContent);
               if (document.body.classList.contains('staff-mode')) {
                 editorFeedback.textContent = 'Conteúdo atualizado em tempo real.';
@@ -852,8 +961,9 @@
         accessScreen.classList.add('is-hidden');
         document.body.classList.remove('access-gated');
         document.body.classList.toggle('staff-mode', mode === 'staff');
+        setInlineEditing(mode === 'staff');
         if (mode === 'staff') {
-          editorFeedback.textContent = 'Painel da equipe liberado. Faça as alterações e salve quando terminar.';
+          editorFeedback.textContent = 'Clique em um texto ou foto destacado para editar direto na página.';
         }
         setTimeout(() => {
           window.dispatchEvent(new Event('resize'));
@@ -903,85 +1013,35 @@
       document.getElementById('logout-button').addEventListener('click', async () => {
         if (supabaseClient) await supabaseClient.auth.signOut();
         document.body.classList.remove('staff-mode');
+        setInlineEditing(false);
         document.body.classList.add('access-gated');
         accessScreen.classList.remove('is-hidden');
         accessScreen.classList.add('is-ready');
         showRoleChoices();
       });
 
-      photoUrlInput.addEventListener('input', () => {
-        if (!pendingPhotoDataUrl && photoUrlInput.value.trim()) {
-          editorPhotoPreview.src = photoUrlInput.value.trim();
-        }
-      });
-      photoFileInput.addEventListener('change', () => {
-        const file = photoFileInput.files[0];
-        if (!file) return;
-        if (file.size > 1024 * 1024) {
-          editorFeedback.textContent = 'Escolha uma imagem de até 1 MB para manter a sincronização rápida.';
-          photoFileInput.value = '';
-          return;
-        }
-        const reader = new FileReader();
-        reader.addEventListener('load', () => {
-          pendingPhotoDataUrl = String(reader.result);
-          editorPhotoPreview.src = pendingPhotoDataUrl;
-          editorFeedback.textContent = 'Nova foto pronta. Clique em “Salvar alterações” para aplicá-la ao site.';
-        });
-        reader.readAsDataURL(file);
-      });
-
-      document.querySelectorAll('[data-site-image-url]').forEach((input) => {
-        input.addEventListener('input', () => {
-          const key = input.dataset.siteImageUrl;
-          if (!pendingSiteImageData[key] && input.value.trim()) {
-            const preview = document.querySelector(`[data-site-image-preview="${key}"]`);
-            if (preview) preview.src = input.value.trim();
-          }
-        });
-      });
-
-      document.querySelectorAll('[data-site-image-file]').forEach((input) => {
-        input.addEventListener('change', () => {
-          const key = input.dataset.siteImageFile;
-          const file = input.files[0];
-          if (!file) return;
-          if (file.size > 1024 * 1024) {
-            editorFeedback.textContent = 'Escolha imagens de até 1 MB para manter o painel rápido.';
-            input.value = '';
-            return;
-          }
-          const reader = new FileReader();
-          reader.addEventListener('load', () => {
-            pendingSiteImageData[key] = String(reader.result);
-            const preview = document.querySelector(`[data-site-image-preview="${key}"]`);
-            if (preview) preview.src = pendingSiteImageData[key];
-            editorFeedback.textContent = 'Nova foto pronta. Clique em “Salvar alterações” para aplicá-la ao site.';
-          });
-          reader.readAsDataURL(file);
-        });
-      });
-
       staffEditor.addEventListener('submit', async (event) => {
         event.preventDefault();
+        const nextPhone = normalizePhone(document.getElementById('edit-phone').value);
+        if (!/^55\d{10,11}$/.test(nextPhone)) {
+          editorFeedback.textContent = 'Digite um telefone válido com DDD. Exemplo: (11) 99999-9999.';
+          document.getElementById('edit-phone').focus();
+          return;
+        }
+        contactSettings = { ...contactSettings, phone: nextPhone };
+        const phoneSaved = writeLocalObject(localContactSettingsKey, contactSettings);
+        applyContactSettings();
         if (!supabaseClient) {
-          editorFeedback.textContent = 'Não foi possível conectar ao banco de dados. Atualize a página e tente novamente.';
+          editorFeedback.textContent = phoneSaved
+            ? 'Número salvo neste navegador. Não foi possível sincronizar os demais dados agora.'
+            : 'Não foi possível salvar o número neste navegador. Atualize a página e tente novamente.';
           return;
         }
         const nextContent = {
+          ...clinicContent,
           address: document.getElementById('edit-address').value.trim(),
-          instagram: normalizeInstagram(document.getElementById('edit-instagram').value),
-          professionalName: document.getElementById('edit-professional-name').value.trim(),
-          professionalRole: document.getElementById('edit-professional-role').value.trim(),
-          professionalDescription: document.getElementById('edit-professional-description').value.trim(),
-          professionalPhoto: pendingPhotoDataUrl || photoUrlInput.value.trim() || clinicContent.professionalPhoto,
-          appointmentMessage: document.getElementById('edit-appointment-message').value.trim()
+          instagram: normalizeInstagram(document.getElementById('edit-instagram').value)
         };
-        const nextSiteImages = { ...siteImages };
-        document.querySelectorAll('[data-site-image-url]').forEach((input) => {
-          const key = input.dataset.siteImageUrl;
-          nextSiteImages[key] = pendingSiteImageData[key] || input.value.trim() || siteImages[key] || siteImageDefaults[key];
-        });
         editorFeedback.textContent = 'Salvando e sincronizando…';
         const { data, error } = await supabaseClient
           .from('clinic_content')
@@ -995,16 +1055,10 @@
           return;
         }
         clinicContent = recordToClinicContent(data);
-        siteImages = nextSiteImages;
-        const imagesSaved = writeLocalObject(localSiteImagesKey, siteImages);
-        pendingPhotoDataUrl = '';
-        photoFileInput.value = '';
-        document.querySelectorAll('[data-site-image-file]').forEach((input) => { input.value = ''; });
-        Object.keys(pendingSiteImageData).forEach((key) => { delete pendingSiteImageData[key]; });
         applyClinicContent(clinicContent);
-        editorFeedback.textContent = imagesSaved
-          ? 'Dados sincronizados. As imagens da página foram salvas neste navegador.'
-          : 'Dados sincronizados. As imagens foram aplicadas nesta sessão, mas não puderam ser mantidas após recarregar.';
+        editorFeedback.textContent = phoneSaved
+          ? 'Dados da clínica sincronizados. Textos, fotos e telefone estão salvos neste navegador.'
+          : 'Dados da clínica sincronizados, mas o telefone não pôde ser salvo neste navegador.';
       });
 
       const menuButton = document.getElementById('menu-button');
