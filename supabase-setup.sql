@@ -4,6 +4,13 @@
 alter table public.clinic_content
 add column if not exists phone text;
 
+-- Conteúdos visuais alterados diretamente no modo funcionário.
+alter table public.clinic_content
+add column if not exists page_content jsonb not null default '{}'::jsonb;
+
+alter table public.clinic_content
+add column if not exists site_images jsonb not null default '{}'::jsonb;
+
 insert into public.clinic_content (
   id,
   address,

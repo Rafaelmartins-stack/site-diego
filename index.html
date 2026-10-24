@@ -205,6 +205,10 @@
       .team-top { max-width: 610px; margin-bottom: 42px; }
       .team-top h2 { margin-bottom: 15px; }
       .team-top .copy { margin: 0; }
+      .team-profile { grid-template-columns: minmax(250px, 365px) minmax(280px, 540px); align-items: center; gap: clamp(34px, 7vw, 110px); }
+      .team-story-panel { padding: 10px 0; }
+      .team-story-panel .eyebrow { margin-bottom: 14px; }
+      .team-story { margin: 0; color: #675f52; font-size: 1.02rem; line-height: 1.8; }
       .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
       .team-grid.single { grid-template-columns: minmax(250px, 365px); }
       .team-grid.duo { grid-template-columns: repeat(2, minmax(250px, 365px)); }
@@ -228,7 +232,7 @@
       .instagram-post { overflow: hidden; border: 10px solid #eee8da; border-radius: var(--radius); background: #eee8da; }
       .instagram-post iframe, .instagram-post img { display: block; width: 100%; min-width: 0; height: 380px; border: 0; border-radius: 14px; background: var(--paper); object-fit: cover; }
       .instagram-post iframe { height: 540px; }
-      .post-link { display: flex; align-items: center; justify-content: space-between; padding: 14px 17px; color: var(--leaf); font-size: .83rem; font-weight: 700; }
+      .post-link { display: flex; align-items: center; justify-content: flex-start; padding: 14px 17px; color: var(--leaf); font-size: .83rem; font-weight: 700; }
       .post-link:hover { color: var(--terracotta); }
       .reviews { padding: 90px 0; background: var(--cream); }
       .reviews-grid { display: grid; grid-template-columns: .83fr 1.17fr; gap: 10%; align-items: center; }
@@ -291,6 +295,13 @@
         .staff-field.full, .photo-editors { grid-column: auto; }
         .image-editor-grid { grid-template-columns: 1fr; }
       }
+      @media (max-width: 700px) {
+        .team-profile { grid-template-columns: 1fr; gap: 24px; }
+        .team-profile .person { display: contents; }
+        .team-profile .person-photo { order: 1; max-width: 360px; margin-bottom: 0; }
+        .team-profile .team-story-panel { order: 2; max-width: 560px; padding: 0; }
+        .team-profile .person-details { order: 3; max-width: 360px; }
+      }
       @media (max-width: 520px) {
         .container { width: min(100% - 30px, 1120px); }
         .access-card { padding: 29px 22px; border-radius: 21px; }
@@ -329,7 +340,7 @@
           <p>Escolha seu perfil para continuar para a clínica.</p>
           <div class="role-options">
             <button class="role-option" id="client-entry" type="button"><span class="role-icon" aria-hidden="true">♡</span><span><strong>Sou cliente</strong>Conhecer a clínica e agendar uma consulta</span></button>
-            <button class="role-option" id="employee-entry" type="button"><span class="role-icon" aria-hidden="true">↗</span><span><strong>Sou funcionário</strong>Acessar com e-mail e senha da equipe</span></button>
+            <button class="role-option" id="employee-entry" type="button"><span class="role-icon" aria-hidden="true">✦</span><span><strong>Sou funcionário</strong>Acessar com e-mail e senha da equipe</span></button>
           </div>
         </div>
         <form class="staff-login" id="staff-login" hidden>
@@ -339,7 +350,7 @@
           <p>Digite o e-mail e a senha da conta de funcionário que deseja usar.</p>
           <label>E-mail da equipe<input id="staff-email" type="email" autocomplete="email" required placeholder="nome@exemplo.com" /></label>
           <label>Senha<input id="staff-password" type="password" autocomplete="current-password" required placeholder="Sua senha" /></label>
-          <button class="btn btn-primary" type="submit">Entrar como funcionário <span class="arrow">→</span></button>
+          <button class="btn btn-primary" type="submit">Entrar no modo funcionário</button>
           <p class="access-feedback" id="access-feedback" aria-live="polite"></p>
           <p class="access-disclaimer">Acesso protegido pelo Supabase. Entre com uma conta de funcionário criada em Authentication.</p>
         </form>
@@ -371,9 +382,9 @@
             <label class="staff-field">Endereço da clínica<input id="edit-address" type="text" required /></label>
             <label class="staff-field">Instagram da clínica<input id="edit-instagram" type="text" required placeholder="@seu.perfil" /></label>
             <label class="staff-field">WhatsApp / telefone<input id="edit-phone" type="tel" inputmode="tel" required placeholder="(11) 99999-9999" /></label>
-            <p class="inline-editor-hint"><strong>Edição visual ativada.</strong> Textos e fotos destacados aparecem apenas para funcionários. Os textos e fotos da página ficam salvos automaticamente neste navegador; o endereço, Instagram e dados do profissional são sincronizados ao clicar em salvar.</p>
+            <p class="inline-editor-hint"><strong>Edição visual ativada.</strong> Textos e fotos destacados aparecem apenas para funcionários e são salvos automaticamente para aparecer em todos os aparelhos.</p>
           </div>
-          <div class="editor-bottom"><p class="editor-feedback" id="editor-feedback" aria-live="polite"></p><button class="btn btn-primary" type="submit">Salvar dados da clínica <span class="arrow">→</span></button></div>
+          <div class="editor-bottom"><p class="editor-feedback" id="editor-feedback" aria-live="polite"></p><button class="btn btn-primary" type="submit">Salvar dados da clínica</button></div>
         </form>
       </div>
     </section>
@@ -386,8 +397,8 @@
             <h1><span data-inline-text="hero-title-start">Saúde, rotina e </span><em><span data-inline-text="hero-title-focus">performance</span></em><span data-inline-text="hero-title-end"> com leveza.</span></h1>
             <p class="copy">Com o Dr. Diego Iamato, nutrição e hábitos se tornam estratégias possíveis para você cuidar do corpo sem complicar a vida.</p>
             <div class="hero-actions">
-              <a class="btn btn-primary" data-whatsapp-link href="https://wa.me/5511999822322" target="_blank" rel="noopener">Agendar uma conversa <span class="arrow">→</span></a>
-              <a class="btn btn-outline" href="#clinica">Conheça o trabalho</a>
+              <a class="btn btn-primary" data-whatsapp-link href="https://wa.me/5511999822322" target="_blank" rel="noopener">Quero agendar uma consulta</a>
+              <a class="btn btn-outline" href="#clinica">Conhecer o trabalho</a>
             </div>
           </div>
           <div class="hero-visual reveal" id="heroVisualArea">
@@ -480,11 +491,12 @@
             <h2>Dr. Diego Iamato, com olhar humano e estratégia.</h2>
             <p class="copy">Conheça o profissional responsável pelo seu acompanhamento e pelas conversas sobre saúde, nutrição, hábitos e performance.</p>
           </div>
-          <div class="team-grid single reveal">
+          <div class="team-grid team-profile reveal">
             <article class="person">
               <div class="person-photo"><img data-professional-photo src="assets/dr-diego.png" alt="Dr. Diego Iamato, nutricionista" /></div>
-              <h3 data-professional-name data-inline-field="professionalName">Diego Iamato</h3><p data-professional-role data-inline-field="professionalRole">Nutricionista · CRN 00000</p><small data-professional-description data-inline-field="professionalDescription">Orientação para uma alimentação mais leve, rotina ativa e objetivos possíveis para a sua saúde.</small>
+              <div class="person-details"><h3 data-professional-name data-inline-field="professionalName">Diego Iamato</h3><p data-professional-role data-inline-field="professionalRole">Nutricionista · CRN 00000</p><small data-professional-description data-inline-field="professionalDescription">Orientação para uma alimentação mais leve, rotina ativa e objetivos possíveis para a sua saúde.</small></div>
             </article>
+            <div class="team-story-panel"><p class="eyebrow">Uma história de cuidado</p><p class="team-story" data-inline-text="team-story">A trajetória do Dr. Diego Iamato nasce da vontade de tornar a nutrição mais próxima da vida real. Em cada atendimento, ele une escuta, planejamento e estratégias personalizadas para ajudar pessoas a cuidarem da saúde com mais leveza, autonomia e constância.</p></div>
           </div>
         </div>
       </section>
@@ -493,7 +505,7 @@
         <div class="container reveal">
           <div class="instagram-card">
             <div><h3>Conteúdo em destaque: Dr. Diego.</h3><p>Acompanhe as ideias, dicas e vídeos do Dr. Diego sobre saúde, nutrição e movimento.</p></div>
-            <a class="instagram-link" href="https://www.instagram.com/diego.iamato/" target="_blank" rel="noopener">@diego.iamato <span class="arrow">↗</span></a>
+            <a class="instagram-link" href="https://www.instagram.com/diego.iamato/" target="_blank" rel="noopener">@diego.iamato</a>
           </div>
         </div>
       </section>
@@ -507,15 +519,15 @@
           <div class="post-grid">
             <article class="instagram-post reveal">
               <iframe title="Publicação do Instagram do Dr. Diego: conteúdo 1" src="https://www.instagram.com/p/DVoluQmEQll/embed/captioned/" loading="lazy" allowfullscreen></iframe>
-              <a class="post-link" href="https://www.instagram.com/p/DVoluQmEQll/" target="_blank" rel="noopener">Abrir no Instagram <span class="arrow">↗</span></a>
+              <a class="post-link" href="https://www.instagram.com/p/DVoluQmEQll/" target="_blank" rel="noopener">Ver publicação no Instagram</a>
             </article>
             <article class="instagram-post reveal">
               <iframe title="Publicação do Instagram do Dr. Diego: conteúdo 2" src="https://www.instagram.com/p/DUB3lZbkZLf/embed/captioned/" loading="lazy" allowfullscreen></iframe>
-              <a class="post-link" href="https://www.instagram.com/p/DUB3lZbkZLf/" target="_blank" rel="noopener">Abrir no Instagram <span class="arrow">↗</span></a>
+              <a class="post-link" href="https://www.instagram.com/p/DUB3lZbkZLf/" target="_blank" rel="noopener">Ver publicação no Instagram</a>
             </article>
             <article class="instagram-post reveal">
               <iframe title="Publicação do Instagram do Dr. Diego: conteúdo 3" src="https://www.instagram.com/p/DNy7pkO4ohN/embed/captioned/" loading="lazy" allowfullscreen></iframe>
-              <a class="post-link" href="https://www.instagram.com/p/DNy7pkO4ohN/" target="_blank" rel="noopener">Abrir no Instagram <span class="arrow">↗</span></a>
+              <a class="post-link" href="https://www.instagram.com/p/DNy7pkO4ohN/" target="_blank" rel="noopener">Ver publicação no Instagram</a>
             </article>
           </div>
         </div>
@@ -553,7 +565,7 @@
           <div class="whatsapp-card reveal">
             <p class="message-label">Agendamento por WhatsApp</p>
             <p class="message-preview" data-appointment-message data-inline-field="appointmentMessage">Olá, bom dia! Gostaria de fazer uma consulta com o Dr. Diego Iamato.</p>
-            <a class="btn btn-primary" data-whatsapp-link href="https://wa.me/5511999822322" target="_blank" rel="noopener">Enviar mensagem <span class="arrow">→</span></a>
+            <a class="btn btn-primary" data-whatsapp-link href="https://wa.me/5511999822322" target="_blank" rel="noopener">Falar pelo WhatsApp</a>
             <p class="whatsapp-note">Você será direcionado ao WhatsApp para combinar seu horário.</p>
           </div>
         </div>
@@ -610,12 +622,13 @@
         professionalDescription: 'Orientação para uma alimentação mais leve, rotina ativa e objetivos possíveis para a sua saúde.',
         professionalPhoto: 'assets/dr-diego.png',
         appointmentMessage: 'Olá, bom dia! Gostaria de fazer uma consulta com o Dr. Diego Iamato.',
-        phone: '5511999822322'
+        phone: '5511999822322',
+        pageContent: {},
+        siteImages: {}
       };
       const staffEditor = document.getElementById('staff-editor');
       const editorFeedback = document.getElementById('editor-feedback');
       const inlineImageInput = document.getElementById('inline-image-input');
-      const localClinicContentKey = 'diego-iamoto-clinic-content-v1';
       const localSiteImagesKey = 'diego-iamoto-site-images-v1';
       const localEditableTextKey = 'diego-iamato-inline-text-v1';
       const siteImageDefaults = {
@@ -625,7 +638,9 @@
         followup: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=900&q=85'
       };
       let inlineImageTarget = '';
-      let hasLocalClinicChanges = false;
+      let remoteSyncTimer = 0;
+      let isRemoteSyncing = false;
+      let remoteSyncQueued = false;
 
       function readLocalObject(key) {
         try {
@@ -693,7 +708,13 @@
           ...content,
           professionalName: correctLegacyName(content.professionalName),
           appointmentMessage: correctLegacyName(content.appointmentMessage),
-          phone: normalizePhone(content.phone || defaultClinicContent.phone)
+          phone: normalizePhone(content.phone || defaultClinicContent.phone),
+          pageContent: content.pageContent && typeof content.pageContent === 'object' && !Array.isArray(content.pageContent)
+            ? content.pageContent
+            : {},
+          siteImages: content.siteImages && typeof content.siteImages === 'object' && !Array.isArray(content.siteImages)
+            ? content.siteImages
+            : {}
         };
       }
 
@@ -708,6 +729,27 @@
           const source = images[element.dataset.siteImage];
           if (source) element.src = source;
         });
+      }
+
+      function applyEditableTextContent() {
+        getInlineTextElements().forEach((element, index) => {
+          const key = element.dataset.inlineText || `page-copy-${index + 1}`;
+          element.dataset.inlineText = key;
+          const savedValue = editableTextContent[key];
+          if (typeof savedValue === 'string') {
+            element.textContent = savedValue;
+            syncReviewClone(element, savedValue);
+          }
+        });
+      }
+
+      function applyPresentationFromClinicContent(content) {
+        editableTextContent = { ...editableTextContent, ...content.pageContent };
+        siteImages = { ...siteImages, ...content.siteImages };
+        writeLocalObject(localEditableTextKey, editableTextContent);
+        writeLocalObject(localSiteImagesKey, siteImages);
+        applyEditableTextContent();
+        applySiteImages(siteImages);
       }
 
       function applyClinicContent(content) {
@@ -748,7 +790,9 @@
           professionalDescription: record.professional_description,
           professionalPhoto: record.professional_photo,
           appointmentMessage: record.appointment_message,
-          phone: record.phone
+          phone: record.phone,
+          pageContent: record.page_content,
+          siteImages: record.site_images
         });
       }
 
@@ -768,21 +812,13 @@
           professional_photo: content.professionalPhoto,
           appointment_message: content.appointmentMessage,
           phone: content.phone,
+          page_content: content.pageContent,
+          site_images: content.siteImages,
           updated_at: new Date().toISOString()
         };
       }
 
-      function loadLocalClinicContent() {
-        const savedContent = readLocalObject(localClinicContentKey);
-        const mergedContent = { ...defaultClinicContent, ...savedContent };
-        if (Object.keys(savedContent).length && isCurrentBrandContent(mergedContent)) {
-          hasLocalClinicChanges = true;
-          return normalizeClinicContent(savedContent);
-        }
-        return {};
-      }
-
-      let clinicContent = { ...defaultClinicContent, ...loadLocalClinicContent() };
+      let clinicContent = { ...defaultClinicContent };
 
       function getInlineTextElements() {
         const selector = [
@@ -811,11 +847,6 @@
         getInlineTextElements().forEach((element, index) => {
           const key = element.dataset.inlineText || `page-copy-${index + 1}`;
           element.dataset.inlineText = key;
-          const savedValue = editableTextContent[key];
-          if (typeof savedValue === 'string') {
-            element.textContent = savedValue;
-            syncReviewClone(element, savedValue);
-          }
           element.contentEditable = 'false';
           element.spellcheck = false;
           element.addEventListener('input', () => {
@@ -826,12 +857,11 @@
               if (target !== element) target.textContent = value;
             });
             syncReviewClone(element, value);
-            const saved = writeLocalObject(localEditableTextKey, editableTextContent);
-            editorFeedback.textContent = saved
-              ? 'Texto salvo neste navegador.'
-              : 'Não foi possível salvar este texto neste navegador.';
+            writeLocalObject(localEditableTextKey, editableTextContent);
+            scheduleRemoteSync();
           });
         });
+        applyEditableTextContent();
       }
 
       function configureInlineClinicFields() {
@@ -845,7 +875,7 @@
             if (element.dataset.inlineField === 'appointmentMessage') {
               document.querySelectorAll('[data-whatsapp-link]').forEach((link) => { link.href = appointmentUrl(value); });
             }
-            editorFeedback.textContent = 'Dado da clínica alterado. Clique em “Salvar dados da clínica” para sincronizar.';
+            scheduleRemoteSync();
           });
         });
       }
@@ -886,14 +916,12 @@
             if (target === 'professionalPhoto') {
               clinicContent = { ...clinicContent, professionalPhoto: source };
               applyClinicContent(clinicContent);
-              editorFeedback.textContent = 'Foto do profissional atualizada. Clique em “Salvar dados da clínica” para sincronizar.';
             } else {
               siteImages = { ...siteImages, [target]: source };
               applySiteImages(siteImages);
-              editorFeedback.textContent = writeLocalObject(localSiteImagesKey, siteImages)
-                ? 'Foto atualizada e salva neste navegador.'
-                : 'A foto foi atualizada, mas não pôde ser salva neste navegador.';
+              writeLocalObject(localSiteImagesKey, siteImages);
             }
+            scheduleRemoteSync();
             inlineImageTarget = '';
           });
           reader.readAsDataURL(file);
@@ -920,11 +948,12 @@
           console.error('Erro ao buscar o conteúdo da clínica:', error);
           return;
         }
-        if (data && !hasLocalClinicChanges) {
+        if (data) {
           const incomingContent = recordToClinicContent(data);
           if (isCurrentBrandContent(incomingContent)) {
             clinicContent = incomingContent;
             applyClinicContent(clinicContent);
+            applyPresentationFromClinicContent(clinicContent);
           }
         }
       }
@@ -940,9 +969,10 @@
             filter: 'id=eq.1'
           }, (payload) => {
             const incomingContent = recordToClinicContent(payload.new);
-            if (!hasLocalClinicChanges && isCurrentBrandContent(incomingContent)) {
+            if (isCurrentBrandContent(incomingContent)) {
               clinicContent = incomingContent;
               applyClinicContent(clinicContent);
+              applyPresentationFromClinicContent(clinicContent);
               if (document.body.classList.contains('staff-mode')) {
                 editorFeedback.textContent = 'Conteúdo atualizado em tempo real.';
               }
@@ -953,6 +983,56 @@
               console.error('A sincronização em tempo real não foi iniciada:', error);
             }
           });
+      }
+
+      function contentReadyForSync() {
+        return {
+          ...clinicContent,
+          pageContent: editableTextContent,
+          siteImages
+        };
+      }
+
+      async function syncPageChanges() {
+        if (!supabaseClient) {
+          editorFeedback.textContent = 'Não foi possível conectar ao banco de dados. Atualize a página e tente novamente.';
+          return false;
+        }
+        if (isRemoteSyncing) {
+          remoteSyncQueued = true;
+          return false;
+        }
+        isRemoteSyncing = true;
+        remoteSyncQueued = false;
+        const { data, error } = await supabaseClient
+          .from('clinic_content')
+          .update(clinicContentToRecord(contentReadyForSync()))
+          .eq('id', 1)
+          .select()
+          .single();
+        isRemoteSyncing = false;
+        if (error) {
+          console.error('Erro ao sincronizar o conteúdo da clínica:', error);
+          editorFeedback.textContent = 'Não foi possível salvar. Confira sua conexão e tente novamente.';
+          return false;
+        }
+        clinicContent = recordToClinicContent(data);
+        applyClinicContent(clinicContent);
+        applyPresentationFromClinicContent(clinicContent);
+        editorFeedback.textContent = 'Alterações salvas e sincronizadas em todos os aparelhos.';
+        if (remoteSyncQueued) {
+          remoteSyncQueued = false;
+          scheduleRemoteSync();
+        }
+        return true;
+      }
+
+      function scheduleRemoteSync() {
+        window.clearTimeout(remoteSyncTimer);
+        editorFeedback.textContent = 'Salvando alterações em todos os aparelhos…';
+        remoteSyncTimer = window.setTimeout(() => {
+          syncPageChanges();
+        }, 700);
       }
 
       loadClinicContentFromSupabase();
@@ -1033,27 +1113,16 @@
           editorFeedback.textContent = 'Não foi possível conectar ao banco de dados. Atualize a página e tente novamente.';
           return;
         }
-        const nextContent = {
+        clinicContent = {
           ...clinicContent,
           address: document.getElementById('edit-address').value.trim(),
           instagram: normalizeInstagram(document.getElementById('edit-instagram').value),
-          phone: nextPhone
+          phone: nextPhone,
+          pageContent: editableTextContent,
+          siteImages
         };
         editorFeedback.textContent = 'Salvando e sincronizando…';
-        const { data, error } = await supabaseClient
-          .from('clinic_content')
-          .update(clinicContentToRecord(nextContent))
-          .eq('id', 1)
-          .select()
-          .single();
-        if (error) {
-          console.error('Erro ao salvar o conteúdo da clínica:', error);
-          editorFeedback.textContent = 'Não foi possível salvar. Confirme se a configuração do Supabase foi concluída.';
-          return;
-        }
-        clinicContent = recordToClinicContent(data);
-        applyClinicContent(clinicContent);
-        editorFeedback.textContent = 'Dados da clínica sincronizados. O telefone agora aparece igual em todos os aparelhos.';
+        await syncPageChanges();
       });
 
       const menuButton = document.getElementById('menu-button');
