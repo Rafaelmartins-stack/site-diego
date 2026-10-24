@@ -609,7 +609,8 @@
         professionalRole: 'Nutricionista · CRN 00000',
         professionalDescription: 'Orientação para uma alimentação mais leve, rotina ativa e objetivos possíveis para a sua saúde.',
         professionalPhoto: 'assets/dr-diego.png',
-        appointmentMessage: 'Olá, bom dia! Gostaria de fazer uma consulta com o Dr. Diego Iamato.'
+        appointmentMessage: 'Olá, bom dia! Gostaria de fazer uma consulta com o Dr. Diego Iamato.',
+        phone: '5511999822322'
       };
       const staffEditor = document.getElementById('staff-editor');
       const editorFeedback = document.getElementById('editor-feedback');
@@ -617,8 +618,6 @@
       const localClinicContentKey = 'diego-iamoto-clinic-content-v1';
       const localSiteImagesKey = 'diego-iamoto-site-images-v1';
       const localEditableTextKey = 'diego-iamato-inline-text-v1';
-      const localContactSettingsKey = 'diego-iamato-contact-settings-v1';
-      const defaultContactSettings = { phone: '5511999822322' };
       const siteImageDefaults = {
         clinic: 'assets/dr-diego.png',
         consultation: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=85',
@@ -658,7 +657,6 @@
 
       let siteImages = loadSiteImages();
       let editableTextContent = readLocalObject(localEditableTextKey);
-      let contactSettings = { ...defaultContactSettings, ...readLocalObject(localContactSettingsKey) };
 
       function normalizeInstagram(value) {
         const withoutUrl = value.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').split('/')[0].replace(/^@/, '');
@@ -683,7 +681,7 @@
       }
 
       function appointmentUrl(message) {
-        return `https://wa.me/${normalizePhone(contactSettings.phone)}?text=${encodeURIComponent(message)}`;
+        return `https://wa.me/${normalizePhone(clinicContent.phone)}?text=${encodeURIComponent(message)}`;
       }
 
       function correctLegacyName(value) {
@@ -694,14 +692,15 @@
         return {
           ...content,
           professionalName: correctLegacyName(content.professionalName),
-          appointmentMessage: correctLegacyName(content.appointmentMessage)
+          appointmentMessage: correctLegacyName(content.appointmentMessage),
+          phone: normalizePhone(content.phone || defaultClinicContent.phone)
         };
       }
 
       function populateEditor(content) {
         document.getElementById('edit-address').value = content.address;
         document.getElementById('edit-instagram').value = content.instagram;
-        document.getElementById('edit-phone').value = formatPhone(contactSettings.phone);
+        document.getElementById('edit-phone').value = formatPhone(content.phone);
       }
 
       function applySiteImages(images) {
@@ -725,11 +724,12 @@
         document.querySelectorAll('[data-appointment-message]').forEach((element) => { element.textContent = content.appointmentMessage; });
         document.querySelectorAll('[data-whatsapp-link]').forEach((element) => { element.href = appointmentUrl(content.appointmentMessage); });
         document.getElementById('clinic-map').src = `https://www.google.com/maps?q=${encodeURIComponent(content.address)}&output=embed`;
+        applyContactSettings(content);
         populateEditor(content);
       }
 
-      function applyContactSettings() {
-        const phone = normalizePhone(contactSettings.phone);
+      function applyContactSettings(content) {
+        const phone = normalizePhone(content.phone);
         document.querySelectorAll('[data-phone-link]').forEach((element) => {
           element.href = `tel:+${phone}`;
           element.textContent = formatPhone(phone);
@@ -747,7 +747,8 @@
           professionalRole: record.professional_role,
           professionalDescription: record.professional_description,
           professionalPhoto: record.professional_photo,
-          appointmentMessage: record.appointment_message
+          appointmentMessage: record.appointment_message,
+          phone: record.phone
         });
       }
 
@@ -766,6 +767,7 @@
           professional_description: content.professionalDescription,
           professional_photo: content.professionalPhoto,
           appointment_message: content.appointmentMessage,
+          phone: content.phone,
           updated_at: new Date().toISOString()
         };
       }
@@ -899,7 +901,6 @@
       }
 
       applyClinicContent(clinicContent);
-      applyContactSettings();
       applySiteImages(siteImages);
       configureInlineTextEditing();
       configureInlineClinicFields();
@@ -1028,19 +1029,15 @@
           document.getElementById('edit-phone').focus();
           return;
         }
-        contactSettings = { ...contactSettings, phone: nextPhone };
-        const phoneSaved = writeLocalObject(localContactSettingsKey, contactSettings);
-        applyContactSettings();
         if (!supabaseClient) {
-          editorFeedback.textContent = phoneSaved
-            ? 'Número salvo neste navegador. Não foi possível sincronizar os demais dados agora.'
-            : 'Não foi possível salvar o número neste navegador. Atualize a página e tente novamente.';
+          editorFeedback.textContent = 'Não foi possível conectar ao banco de dados. Atualize a página e tente novamente.';
           return;
         }
         const nextContent = {
           ...clinicContent,
           address: document.getElementById('edit-address').value.trim(),
-          instagram: normalizeInstagram(document.getElementById('edit-instagram').value)
+          instagram: normalizeInstagram(document.getElementById('edit-instagram').value),
+          phone: nextPhone
         };
         editorFeedback.textContent = 'Salvando e sincronizando…';
         const { data, error } = await supabaseClient
@@ -1056,9 +1053,7 @@
         }
         clinicContent = recordToClinicContent(data);
         applyClinicContent(clinicContent);
-        editorFeedback.textContent = phoneSaved
-          ? 'Dados da clínica sincronizados. Textos, fotos e telefone estão salvos neste navegador.'
-          : 'Dados da clínica sincronizados, mas o telefone não pôde ser salvo neste navegador.';
+        editorFeedback.textContent = 'Dados da clínica sincronizados. O telefone agora aparece igual em todos os aparelhos.';
       });
 
       const menuButton = document.getElementById('menu-button');

@@ -1,6 +1,9 @@
 -- Execute este arquivo uma única vez no SQL Editor do Supabase.
 -- Ele não apaga um conteúdo que já exista na linha id = 1.
 
+alter table public.clinic_content
+add column if not exists phone text;
+
 insert into public.clinic_content (
   id,
   address,
@@ -9,7 +12,8 @@ insert into public.clinic_content (
   professional_role,
   professional_description,
   professional_photo,
-  appointment_message
+  appointment_message,
+  phone
 )
 values (
   1,
@@ -19,7 +23,8 @@ values (
   'Nutricionista · CRN 00000',
   'Orientação para uma alimentação mais leve, rotina ativa e objetivos possíveis para a sua saúde.',
   'assets/dr-diego.png',
-  'Olá, bom dia!, Gostaria de fazer uma consulta com o Dr. Diego.'
+  'Olá, bom dia!, Gostaria de fazer uma consulta com o Dr. Diego.',
+  '5511999822322'
 )
 on conflict (id) do nothing;
 
