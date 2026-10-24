@@ -58,9 +58,10 @@
       .opening-screen::after { width: 38vw; height: 38vw; max-width: 520px; max-height: 520px; right: -13vw; bottom: -19vw; }
       .opening-screen.is-hidden { opacity: 0; visibility: hidden; }
       .opening-logo { position: relative; display: grid; justify-items: center; gap: 14px; }
+      .opening-monogram { width: clamp(88px, 12vw, 138px); height: clamp(88px, 12vw, 138px); object-fit: contain; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .2)); animation: opening-mark .8s .1s both; }
       .opening-logo .brand-name { font-size: clamp(2.2rem, 7vw, 4rem); }
       .opening-logo .brand-kicker { color: #d7bd78; }
-      .opening-logo .brand-lockup { animation: opening-mark .8s .18s both; }
+      .opening-logo .brand-lockup { animation: opening-mark .8s .28s both; }
       .opening-line { height: 1px; background: #d7bd78; animation: opening-line .65s .68s both; }
       .access-screen { z-index: 29; background: rgba(245, 242, 234, .96); opacity: 0; pointer-events: none; transition: opacity .45s ease; }
       .access-screen.is-ready { opacity: 1; pointer-events: auto; }
@@ -86,6 +87,11 @@
       .staff-status { position: fixed; right: 18px; bottom: 18px; z-index: 20; display: none; align-items: center; gap: 9px; padding: 11px 15px; border: 1px solid var(--line); border-radius: 99px; background: rgba(255, 253, 248, .92); box-shadow: 0 10px 25px rgba(23,21,18,.1); color: var(--leaf); font-size: .8rem; font-weight: 700; }
       .staff-status button { padding: 0; border: 0; background: transparent; color: var(--terracotta); cursor: pointer; font: inherit; font-weight: 700; }
       body.staff-mode .staff-status { display: flex; }
+      .mode-switch { position: fixed; right: 18px; bottom: 18px; z-index: 21; display: none; align-items: center; min-height: 44px; padding: 0 17px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255, 253, 248, .94); box-shadow: 0 10px 25px rgba(23,21,18,.13); color: var(--ink); cursor: pointer; font-size: .8rem; font-weight: 700; transition: transform .2s, border-color .2s, background .2s; }
+      .mode-switch:hover { transform: translateY(-2px); border-color: var(--leaf); background: var(--paper); }
+      .mode-switch:focus-visible { outline: 3px solid rgba(170, 138, 76, .35); outline-offset: 3px; }
+      body:not(.access-gated) .mode-switch { display: inline-flex; }
+      body.staff-mode .mode-switch { bottom: 72px; }
       .staff-dashboard { display: none; padding: 48px 0; background: #211e19; color: white; }
       body.staff-mode .staff-dashboard { display: block; animation: staff-panel-in .55s ease both; }
       @keyframes staff-panel-in { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
@@ -127,7 +133,8 @@
       header { position: sticky; top: 0; z-index: 10; border-bottom: 1px solid rgba(228, 221, 207, .72); background: rgba(245, 242, 234, .9); backdrop-filter: blur(12px); }
       .topbar { display: flex; align-items: center; justify-content: space-between; min-height: 76px; }
       .brand { display: inline-flex; align-items: center; color: var(--ink); }
-      .brand-lockup { display: inline-flex; align-items: center; }
+      .brand-lockup { display: inline-flex; align-items: center; gap: 9px; }
+      .brand-monogram { width: 38px; height: 38px; object-fit: contain; flex: 0 0 auto; }
       .brand-wordmark { display: grid; gap: 2px; line-height: 1; }
       .brand-kicker { color: var(--leaf); font-size: .44rem; font-weight: 700; letter-spacing: .23em; text-transform: uppercase; }
       .brand-name { color: currentColor; font-family: "Playfair Display", serif; font-size: 1.08rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; }
@@ -315,6 +322,8 @@
         .instagram-card { align-items: flex-start; flex-direction: column; padding: 29px; gap: 18px; }
         .instagram-post iframe { height: 510px; }
         .editor-bottom { align-items: flex-start; flex-direction: column; }
+        .mode-switch { right: 13px; bottom: 13px; min-height: 42px; padding: 0 14px; font-size: .75rem; }
+        body.staff-mode .mode-switch { bottom: 67px; }
         .person { max-width: 360px; }
         .map-wrap { height: 330px; }
         .footer-row { align-items: flex-start; flex-direction: column; }
@@ -324,6 +333,7 @@
   <body class="access-gated">
     <div class="opening-screen" id="opening-screen" aria-hidden="true">
       <div class="opening-logo">
+        <img class="opening-monogram" src="assets/monograma-botanico-di.png" alt="" />
         <span class="brand-lockup">
           <span class="brand-wordmark"><span class="brand-kicker">Nutrição</span><span class="brand-name">Diego Iamato</span><span class="brand-signature">Saúde &amp; Performance</span></span>
         </span>
@@ -358,7 +368,7 @@
     </section>
     <header>
       <div class="container topbar">
-        <a class="brand" href="#inicio" aria-label="Diego Iamato, início"><span class="brand-lockup"><span class="brand-wordmark"><span class="brand-kicker">Nutrição</span><span class="brand-name">Diego Iamato</span><span class="brand-signature">Saúde &amp; Performance</span></span></span></a>
+        <a class="brand" href="#inicio" aria-label="Diego Iamato, início"><span class="brand-lockup"><img class="brand-monogram" src="assets/monograma-botanico-di.png" alt="" /><span class="brand-wordmark"><span class="brand-kicker">Nutrição</span><span class="brand-name">Diego Iamato</span><span class="brand-signature">Saúde &amp; Performance</span></span></span></a>
         <button class="menu" id="menu-button" aria-label="Abrir menu" aria-expanded="false">☰</button>
         <nav id="main-nav" aria-label="Navegação principal">
           <a href="#clinica">A clínica</a>
@@ -598,6 +608,7 @@
     </footer>
 
     <div class="staff-status" id="staff-status" aria-live="polite">Modo funcionário ativo <button id="logout-button" type="button">Sair</button></div>
+    <button class="mode-switch" id="mode-switch" type="button" aria-label="Trocar entre cliente e funcionário">Trocar acesso</button>
     <input class="inline-image-input" id="inline-image-input" type="file" accept="image/png,image/jpeg,image/webp" />
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1058,6 +1069,17 @@
         staffLogin.reset();
       }
 
+      async function returnToRoleSelection() {
+        if (supabaseClient) await supabaseClient.auth.signOut();
+        document.body.classList.remove('staff-mode');
+        setInlineEditing(false);
+        document.body.classList.add('access-gated');
+        accessScreen.classList.remove('is-hidden');
+        accessScreen.classList.add('is-ready');
+        showRoleChoices();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
       setTimeout(() => {
         openingScreen.classList.add('is-hidden');
         accessScreen.classList.add('is-ready');
@@ -1091,15 +1113,8 @@
         feedback.textContent = 'E-mail ou senha não conferem. Verifique os dados e tente novamente.';
         staffPassword.focus();
       });
-      document.getElementById('logout-button').addEventListener('click', async () => {
-        if (supabaseClient) await supabaseClient.auth.signOut();
-        document.body.classList.remove('staff-mode');
-        setInlineEditing(false);
-        document.body.classList.add('access-gated');
-        accessScreen.classList.remove('is-hidden');
-        accessScreen.classList.add('is-ready');
-        showRoleChoices();
-      });
+      document.getElementById('logout-button').addEventListener('click', returnToRoleSelection);
+      document.getElementById('mode-switch').addEventListener('click', returnToRoleSelection);
 
       staffEditor.addEventListener('submit', async (event) => {
         event.preventDefault();
