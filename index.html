@@ -92,6 +92,15 @@
       .mode-switch:focus-visible { outline: 3px solid rgba(170, 138, 76, .35); outline-offset: 3px; }
       body:not(.access-gated) .mode-switch { display: inline-flex; }
       body.staff-mode .mode-switch { bottom: 72px; }
+      /* Nos portais, a navegação fica concentrada na tarefa que a pessoa veio realizar. */
+      body.patient-mode header,
+      body.staff-agenda-mode header { display: none; }
+      body.patient-mode main > :not(.instagram-band):not(.social-feed),
+      body.staff-agenda-mode main > :not(.location) { display: none; }
+      body.patient-mode .instagram-band { padding-top: 66px; }
+      body.staff-agenda-mode .location { padding-top: 46px; }
+      body.staff-agenda-mode .location-copy { padding-bottom: 34px; }
+      body.staff-agenda-mode .map-wrap { display: none; }
       .staff-dashboard, .agenda-dashboard, .patient-portal { display: none; }
       .staff-dashboard, .agenda-dashboard { padding: 48px 0; background: #211e19; color: white; }
       body.staff-editor-mode .staff-dashboard, body.staff-agenda-mode .agenda-dashboard, body.patient-mode .patient-portal { display: block; animation: staff-panel-in .55s ease both; }
@@ -136,9 +145,14 @@
       .availability-card { grid-column: 1 / -1; border-color: rgba(215, 189, 120, .42); background: linear-gradient(135deg, rgba(255, 250, 240, .1), rgba(215, 189, 120, .06)); }
       .availability-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 17px; }
       .availability-card-header p { max-width: 620px; margin: 3px 0 0; color: #eee4d2; font-size: .84rem; line-height: 1.5; }
-      .availability-form-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-      .availability-form-grid .agenda-field:last-of-type { grid-column: span 2; }
-      .weekday-picker { display: flex; flex-wrap: wrap; gap: 7px; grid-column: 1 / -1; }
+      .availability-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .availability-step { display: grid; gap: 13px; padding: 16px; border: 1px solid rgba(215, 189, 120, .24); border-radius: 14px; background: rgba(0, 0, 0, .12); }
+      .availability-step--days, .availability-actions { grid-column: 1 / -1; }
+      .availability-step-title { display: flex; align-items: center; gap: 8px; margin: 0; color: #fffaf0; font-size: .82rem; font-weight: 700; }
+      .availability-step-title strong { display: grid; width: 21px; height: 21px; place-items: center; border-radius: 50%; background: #d7bd78; color: #211e19; font-size: .7rem; }
+      .availability-step-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .availability-step--hours .agenda-field:last-child { grid-column: 1 / -1; }
+      .weekday-picker { display: flex; flex-wrap: wrap; gap: 7px; }
       .weekday-choice { position: relative; display: inline-flex; }
       .weekday-choice input { position: absolute; opacity: 0; pointer-events: none; }
       .weekday-choice span { min-width: 42px; padding: 9px 10px; border: 1px solid rgba(215, 189, 120, .42); border-radius: 999px; color: #eee4d2; cursor: pointer; font-size: .75rem; font-weight: 700; text-align: center; transition: .18s ease; }
@@ -146,7 +160,11 @@
       .weekday-choice input:focus-visible + span { outline: 3px solid rgba(215,189,120,.25); outline-offset: 2px; }
       .availability-actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; grid-column: 1 / -1; margin-top: 4px; }
       .availability-actions .agenda-feedback { margin: 0; }
-      .availability-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 10px; margin-top: 20px; }
+      .availability-preview { grid-column: 1 / -1; margin: 0; padding: 12px 14px; border-left: 3px solid #d7bd78; border-radius: 8px; background: rgba(215, 189, 120, .11); color: #eee4d2; font-size: .82rem; line-height: 1.5; }
+      .availability-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 24px 0 10px; }
+      .availability-list-heading h4 { margin: 0; color: #fffaf0; font-size: .9rem; }
+      .availability-count { padding: 5px 9px; border-radius: 999px; background: rgba(215, 189, 120, .16); color: #f3d994; font-size: .7rem; font-weight: 700; }
+      .availability-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 10px; }
       .availability-item { display: grid; gap: 7px; padding: 14px; border: 1px solid rgba(215, 189, 120, .26); border-radius: 13px; background: rgba(0, 0, 0, .16); }
       .availability-item strong { color: #fffaf0; font-size: .9rem; }
       .availability-item span { color: #eee4d2; font-size: .8rem; }
@@ -161,9 +179,12 @@
       .appointment-item strong, .note-item strong { display: block; margin-bottom: 4px; color: #fffaf0; font-size: .92rem; }
       .appointment-item span, .note-item p { margin: 0; color: #eee4d2; font-size: .82rem; line-height: 1.48; }
       .appointment-meta { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin-top: 10px; }
+      .appointment-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
       .status-pill { display: inline-flex; width: fit-content; padding: 4px 8px; border-radius: 999px; background: rgba(215, 189, 120, .18); color: #f3d994; font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
       .appointment-action { padding: 5px 8px; border: 1px solid rgba(215, 189, 120, .45); border-radius: 7px; background: transparent; color: #fffaf0; cursor: pointer; font: inherit; font-size: .72rem; font-weight: 700; }
       .appointment-action:hover { background: rgba(215, 189, 120, .15); }
+      .appointment-action-danger { border-color: rgba(229, 122, 101, .72); color: #ffc0b3; }
+      .appointment-action-danger:hover { background: rgba(199, 77, 55, .2); }
       .patient-portal { padding: 50px 0; background: linear-gradient(135deg, #211e19, #302a21); color: #fffaf0; }
       .portal-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
       .portal-heading .eyebrow { color: #d7bd78; }
@@ -377,8 +398,8 @@
         .staff-field.full, .photo-editors { grid-column: auto; }
         .image-editor-grid { grid-template-columns: 1fr; }
         .agenda-grid, .portal-grid { grid-template-columns: 1fr; }
-        .availability-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .availability-form-grid .agenda-field:last-of-type { grid-column: auto; }
+        .availability-form-grid { grid-template-columns: 1fr; }
+        .availability-step--days, .availability-actions { grid-column: auto; }
       }
       @media (max-width: 700px) {
         .team-grid.team-profile { grid-template-columns: 1fr; gap: 24px; }
@@ -403,6 +424,8 @@
         .agenda-dashboard, .patient-portal { padding: 37px 0; }
         .agenda-card, .portal-card { padding: 19px; }
         .availability-card-header, .availability-actions { align-items: flex-start; flex-direction: column; }
+        .availability-step-fields { grid-template-columns: 1fr; }
+        .availability-step--hours .agenda-field:last-child { grid-column: auto; }
         .availability-actions .btn { width: 100%; }
         .portal-heading { align-items: flex-start; flex-direction: column; }
         .mode-switch { right: 13px; bottom: 13px; min-height: 42px; padding: 0 14px; font-size: .75rem; }
@@ -482,13 +505,13 @@
           <button class="back-button" id="back-to-client-choice-signup" type="button">← Voltar</button>
           <p class="eyebrow">Portal do paciente</p>
           <h1>Crie seu acesso.</h1>
-          <p>Com uma conta você acompanha as orientações da consulta e solicita novos horários.</p>
+          <p>Com uma conta você acompanha as orientações da consulta e solicita novos horários. Ao concluir o cadastro, seu portal abre automaticamente.</p>
           <label>Seu nome completo<input id="patient-name-input" type="text" autocomplete="name" required placeholder="Nome e sobrenome" /></label>
           <label>Seu e-mail<input id="patient-signup-email" type="email" autocomplete="email" required placeholder="voce@exemplo.com" /></label>
           <label>Crie uma senha<input id="patient-signup-password" type="password" autocomplete="new-password" minlength="6" required placeholder="Mínimo de 6 caracteres" /></label>
           <button class="btn btn-primary" type="submit">Criar minha conta</button>
           <p class="access-feedback" id="patient-signup-feedback" aria-live="polite"></p>
-          <p class="access-disclaimer">Se a confirmação por e-mail estiver ativa, você receberá um link para validar sua conta antes de entrar.</p>
+          <p class="access-disclaimer">Seu acesso será aberto assim que o cadastro for concluído.</p>
         </form>
       </div>
     </section>
@@ -533,27 +556,42 @@
         <div class="agenda-grid">
           <div class="agenda-card availability-card">
             <div class="availability-card-header">
-              <div><h3>Liberar horários</h3><p>Defina um dia específico ou um período. Por exemplo: de segunda a sexta, das 9h às 18h, com consultas de até 1h30.</p></div>
+              <div><h3>Liberar horários</h3><p>Monte a agenda em três passos: escolha o período, defina o expediente e selecione os dias em que haverá atendimento.</p></div>
             </div>
             <form class="agenda-form" id="availability-form">
               <div class="availability-form-grid">
-                <label class="agenda-field">A partir de<input id="availability-start-date" type="date" required /></label>
-                <label class="agenda-field">Até<input id="availability-end-date" type="date" required /></label>
-                <label class="agenda-field">Início<input id="availability-start-time" type="time" value="09:00" required /></label>
-                <label class="agenda-field">Fim<input id="availability-end-time" type="time" value="18:00" required /></label>
-                <label class="agenda-field">Duração de cada consulta<select id="availability-duration" required><option value="30">30 minutos</option><option value="45">45 minutos</option><option value="60" selected>1 hora</option><option value="90">1 hora e 30 minutos</option></select></label>
-                <div class="weekday-picker" aria-label="Dias da semana">
-                  <label class="weekday-choice"><input type="checkbox" value="1" checked /><span>Seg</span></label>
-                  <label class="weekday-choice"><input type="checkbox" value="2" checked /><span>Ter</span></label>
-                  <label class="weekday-choice"><input type="checkbox" value="3" checked /><span>Qua</span></label>
-                  <label class="weekday-choice"><input type="checkbox" value="4" checked /><span>Qui</span></label>
-                  <label class="weekday-choice"><input type="checkbox" value="5" checked /><span>Sex</span></label>
-                  <label class="weekday-choice"><input type="checkbox" value="6" /><span>Sáb</span></label>
-                  <label class="weekday-choice"><input type="checkbox" value="0" /><span>Dom</span></label>
-                </div>
+                <section class="availability-step">
+                  <p class="availability-step-title"><strong>1</strong>Período a abrir</p>
+                  <div class="availability-step-fields">
+                    <label class="agenda-field">Primeiro dia<input id="availability-start-date" type="date" required /></label>
+                    <label class="agenda-field">Último dia<input id="availability-end-date" type="date" required /></label>
+                  </div>
+                </section>
+                <section class="availability-step availability-step--hours">
+                  <p class="availability-step-title"><strong>2</strong>Expediente e duração</p>
+                  <div class="availability-step-fields">
+                    <label class="agenda-field">Início<input id="availability-start-time" type="time" value="09:00" required /></label>
+                    <label class="agenda-field">Fim<input id="availability-end-time" type="time" value="18:00" required /></label>
+                    <label class="agenda-field">Duração de cada consulta<select id="availability-duration" required><option value="30">30 minutos</option><option value="45">45 minutos</option><option value="60" selected>1 hora</option><option value="90">1 hora e 30 minutos</option></select></label>
+                  </div>
+                </section>
+                <section class="availability-step availability-step--days">
+                  <p class="availability-step-title"><strong>3</strong>Dias de atendimento</p>
+                  <div class="weekday-picker" aria-label="Dias da semana">
+                    <label class="weekday-choice"><input type="checkbox" value="1" checked /><span>Seg</span></label>
+                    <label class="weekday-choice"><input type="checkbox" value="2" checked /><span>Ter</span></label>
+                    <label class="weekday-choice"><input type="checkbox" value="3" checked /><span>Qua</span></label>
+                    <label class="weekday-choice"><input type="checkbox" value="4" checked /><span>Qui</span></label>
+                    <label class="weekday-choice"><input type="checkbox" value="5" checked /><span>Sex</span></label>
+                    <label class="weekday-choice"><input type="checkbox" value="6" /><span>Sáb</span></label>
+                    <label class="weekday-choice"><input type="checkbox" value="0" /><span>Dom</span></label>
+                  </div>
+                </section>
+                <p class="availability-preview" id="availability-preview" aria-live="polite">Escolha o período e os dias para conferir o resumo da liberação.</p>
                 <div class="availability-actions"><p class="agenda-feedback" id="availability-feedback" aria-live="polite"></p><button class="btn btn-primary" type="submit">Liberar horários</button></div>
               </div>
             </form>
+            <div class="availability-list-heading"><h4>Próximas datas abertas</h4><span class="availability-count" id="availability-open-count">Carregando…</span></div>
             <div class="availability-list" id="availability-list"><p class="portal-empty">Carregando horários liberados…</p></div>
           </div>
           <div class="agenda-card">
@@ -1325,6 +1363,40 @@
         return minutes === 60 ? '1 hora' : minutes === 90 ? '1h30' : minutes + ' min';
       }
 
+      function updateAvailabilityPreview() {
+        const preview = document.getElementById('availability-preview');
+        if (!preview) return;
+        const startDate = document.getElementById('availability-start-date').value;
+        const endDate = document.getElementById('availability-end-date').value;
+        const startTime = document.getElementById('availability-start-time').value;
+        const endTime = document.getElementById('availability-end-time').value;
+        const duration = Number(document.getElementById('availability-duration').value);
+        const weekdays = [...document.querySelectorAll('.weekday-choice input:checked')].map((input) => Number(input.value));
+        if (!startDate || !endDate || !weekdays.length) {
+          preview.textContent = 'Escolha o período e os dias para conferir o resumo da liberação.';
+          return;
+        }
+        if (endDate < startDate) {
+          preview.textContent = 'O último dia precisa ser igual ou posterior ao primeiro dia.';
+          return;
+        }
+        let dateCount = 0;
+        const cursor = new Date(startDate + 'T12:00:00');
+        const end = new Date(endDate + 'T12:00:00');
+        while (cursor <= end) {
+          if (weekdays.includes(cursor.getDay())) dateCount += 1;
+          cursor.setDate(cursor.getDate() + 1);
+        }
+        if (!dateCount) {
+          preview.textContent = 'Nenhum dos dias selecionados existe dentro deste período.';
+          return;
+        }
+        const formatter = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' });
+        const startLabel = formatter.format(new Date(startDate + 'T12:00:00')).replace('.', '');
+        const endLabel = formatter.format(new Date(endDate + 'T12:00:00')).replace('.', '');
+        preview.textContent = 'Você vai abrir ' + dateCount + (dateCount === 1 ? ' dia' : ' dias') + ' entre ' + startLabel + ' e ' + endLabel + ', das ' + (startTime || '--:--') + ' às ' + (endTime || '--:--') + ', em consultas de ' + formatDuration(duration) + '.';
+      }
+
       function normalizeSlotTime(value) {
         return String(value || '').slice(0, 5);
       }
@@ -1439,14 +1511,21 @@
           const confirmAction = appointment.status === 'requested'
             ? '<button class="appointment-action" type="button" data-confirm-appointment="' + appointment.id + '">Confirmar</button>'
             : '';
+          const cancelAction = appointment.status !== 'cancelled' && appointment.status !== 'completed'
+            ? '<button class="appointment-action appointment-action-danger" type="button" data-cancel-appointment="' + appointment.id + '">Cancelar consulta</button>'
+            : '';
           const duration = appointment.duration_minutes ? ' · ' + formatDuration(Number(appointment.duration_minutes)) : '';
-          return '<article class="appointment-item"><strong>' + patientName + '</strong><span>' + formatAppointmentDate(appointment.scheduled_at) + duration + '</span>' + message + '<div class="appointment-meta"><span class="status-pill">' + statusLabel(appointment.status) + '</span>' + confirmAction + '</div></article>';
+          return '<article class="appointment-item"><strong>' + patientName + '</strong><span>' + formatAppointmentDate(appointment.scheduled_at) + duration + '</span>' + message + '<div class="appointment-meta"><span class="status-pill">' + statusLabel(appointment.status) + '</span><div class="appointment-actions">' + confirmAction + cancelAction + '</div></div></article>';
         }).join('');
       }
 
       function renderStaffAvailability() {
         const list = document.getElementById('availability-list');
+        const count = document.getElementById('availability-open-count');
         if (!list) return;
+        if (count) count.textContent = staffAvailability.length
+          ? staffAvailability.length + (staffAvailability.length === 1 ? ' data aberta' : ' datas abertas')
+          : 'Nenhuma data aberta';
         if (!staffAvailability.length) {
           list.innerHTML = '<p class="portal-empty">Nenhum horário liberado ainda. Use o formulário acima para abrir a agenda.</p>';
           return;
@@ -1623,6 +1702,10 @@
       document.getElementById('availability-end-date').min = todayForAgenda;
       document.getElementById('availability-start-date').value = todayForAgenda;
       document.getElementById('availability-end-date').value = todayForAgenda;
+      document.querySelectorAll('#availability-form input, #availability-form select').forEach((field) => {
+        field.addEventListener('change', updateAvailabilityPreview);
+      });
+      updateAvailabilityPreview();
       renderPatientCalendar();
 
       loadClinicContentFromSupabase();
@@ -1755,6 +1838,7 @@
         const endInput = document.getElementById('availability-end-date');
         endInput.min = event.target.value || todayForAgenda;
         if (endInput.value && endInput.value < event.target.value) endInput.value = event.target.value;
+        updateAvailabilityPreview();
       });
       document.getElementById('staff-appointment-date').addEventListener('change', async (event) => {
         const feedbackElement = document.getElementById('staff-appointment-feedback');
@@ -1803,7 +1887,15 @@
           return;
         }
         if (!data.session) {
-          patientSignupFeedback.textContent = 'Conta criada. Confira seu e-mail para confirmar o acesso antes de entrar no portal.';
+          const { data: loginData, error: loginError } = await supabaseClient.auth.signInWithPassword({
+            email: document.getElementById('patient-signup-email').value.trim(),
+            password: document.getElementById('patient-signup-password').value
+          });
+          if (!loginError && loginData.user) {
+            await openPatientPortal(loginData.user);
+            return;
+          }
+          patientSignupFeedback.textContent = 'A conta foi criada, mas a confirmação por e-mail está ativa. Para entrar automaticamente, desative “Confirm email” em Authentication → Providers → Email no Supabase.';
           return;
         }
         await openPatientPortal(data.user);
@@ -2013,18 +2105,23 @@
         await loadStaffAgenda();
       });
       document.getElementById('staff-appointments-list').addEventListener('click', async (event) => {
-        const button = event.target.closest('[data-confirm-appointment]');
+        const button = event.target.closest('[data-confirm-appointment], [data-cancel-appointment]');
         if (!button) return;
+        const cancelling = Boolean(button.dataset.cancelAppointment);
+        if (cancelling && !window.confirm('Cancelar esta consulta? O horário ficará disponível novamente para agendamento.')) return;
         button.disabled = true;
         const { error } = await supabaseClient
           .from('appointments')
-          .update({ status: 'confirmed' })
-          .eq('id', button.dataset.confirmAppointment);
+          .update({ status: cancelling ? 'cancelled' : 'confirmed' })
+          .eq('id', cancelling ? button.dataset.cancelAppointment : button.dataset.confirmAppointment);
         if (error) {
           document.getElementById('staff-appointment-feedback').textContent = agendaSetupMessage(error);
           button.disabled = false;
           return;
         }
+        document.getElementById('staff-appointment-feedback').textContent = cancelling
+          ? 'Consulta cancelada. O horário está disponível novamente.'
+          : 'Consulta confirmada e atualizada no portal do cliente.';
         await loadStaffAgenda();
       });
 

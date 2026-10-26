@@ -84,6 +84,10 @@ $$;
 -- As regras abaixo protegem os dados: cada paciente lê somente o próprio perfil,
 -- consultas e orientações. Apenas a equipe pode consultar todos os pacientes e
 -- registrar orientações clínicas.
+--
+-- Para que uma conta nova entre imediatamente no portal, desative a confirmação
+-- de e-mail no painel do Supabase: Authentication > Providers > Email >
+-- "Confirm email". Essa opção é de autenticação e não pode ser alterada por SQL.
 -- ============================================================================
 
 create table if not exists public.patient_profiles (
