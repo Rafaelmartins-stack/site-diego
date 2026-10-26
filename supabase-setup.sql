@@ -263,3 +263,143 @@ begin
 exception when duplicate_object then null;
 end;
 $$;
+
+-- ============================================================================
+-- DISPONIBILIDADE DE HORÁRIOS
+-- Execute novamente este arquivo no SQL Editor após atualizar o site.
+-- A equipe abre a agenda por dia ou por período; pacientes só enxergam os
+-- horários livres e o banco também impede solicitações fora desses horários.
+-- ============================================================================
+
+create table if not exists public.appointment_availability (
+  id uuid primary key default gen_random_uuid(),
+  available_date date not null unique,
+  start_time time not null,
+  end_time time not null,
+  slot_minutes smallint not null default 60 check (slot_minutes in (30, 45, 60, 90)),
+  updated_by uuid references auth.users(id) on delete set null default auth.uid(),
+  updated_at timestamptz not null default now(),
+  check (end_time > start_time)
+);
+
+alter table public.appointment_availability enable row level security;
+
+grant select, insert, update, delete
+on public.appointment_availability
+to authenticated;
+
+drop policy if exists "Authenticated users can read appointment availability" on public.appointment_availability;
+create policy "Authenticated users can read appointment availability"
+on public.appointment_availability for select to authenticated
+using (true);
+
+drop policy if exists "Staff can create appointment availability" on public.appointment_availability;
+create policy "Staff can create appointment availability"
+on public.appointment_availability for insert to authenticated
+with check (public.is_staff());
+
+drop policy if exists "Staff can update appointment availability" on public.appointment_availability;
+create policy "Staff can update appointment availability"
+on public.appointment_availability for update to authenticated
+using (public.is_staff())
+with check (public.is_staff());
+
+drop policy if exists "Staff can delete appointment availability" on public.appointment_availability;
+create policy "Staff can delete appointment availability"
+on public.appointment_availability for delete to authenticated
+using (public.is_staff());
+
+-- Confere, no fuso de São Paulo, se uma consulta pertence a um horário liberado.
+create or replace function public.appointment_matches_availability(
+  p_scheduled_at timestamptz,
+  p_duration_minutes smallint
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  with local_slot as (
+    select p_scheduled_at at time zone 'America/Sao_Paulo' as starts_at
+  )
+  select exists (
+    select 1
+    from public.appointment_availability as availability
+    cross join local_slot
+    where availability.available_date = local_slot.starts_at::date
+      and availability.slot_minutes = p_duration_minutes
+      and local_slot.starts_at >= availability.available_date + availability.start_time
+      and local_slot.starts_at + make_interval(mins => p_duration_minutes::integer) <= availability.available_date + availability.end_time
+      and mod(
+        extract(epoch from (local_slot.starts_at - (availability.available_date + availability.start_time)))::bigint,
+        availability.slot_minutes::bigint * 60
+      ) = 0
+  );
+$$;
+
+revoke all on function public.appointment_matches_availability(timestamptz, smallint) from public;
+grant execute on function public.appointment_matches_availability(timestamptz, smallint) to authenticated;
+
+-- Entrega somente horários livres, sem expor dados ou compromissos de outros pacientes.
+create or replace function public.get_available_appointment_slots(target_date date)
+returns table (start_time time, duration_minutes smallint)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  with generated_slots as (
+    select
+      availability.available_date + availability.start_time + make_interval(mins => availability.slot_minutes::integer * slot_number) as slot_starts_at,
+      availability.slot_minutes
+    from public.appointment_availability as availability
+    cross join lateral generate_series(
+      0,
+      floor(
+        extract(epoch from ((availability.available_date + availability.end_time) - (availability.available_date + availability.start_time)))
+        / (availability.slot_minutes::integer * 60)
+      )::integer - 1
+    ) as slot_number
+    where availability.available_date = target_date
+  )
+  select generated_slots.slot_starts_at::time, generated_slots.slot_minutes
+  from generated_slots
+  where not exists (
+    select 1
+    from public.appointments as appointment
+    where appointment.status <> 'cancelled'
+      and tstzrange(
+        appointment.scheduled_at,
+        appointment.scheduled_at + make_interval(mins => appointment.duration_minutes::integer),
+        '[)'
+      ) && tstzrange(
+        generated_slots.slot_starts_at at time zone 'America/Sao_Paulo',
+        (generated_slots.slot_starts_at + make_interval(mins => generated_slots.slot_minutes::integer)) at time zone 'America/Sao_Paulo',
+        '[)'
+      )
+  )
+  order by generated_slots.slot_starts_at;
+$$;
+
+revoke all on function public.get_available_appointment_slots(date) from public;
+grant execute on function public.get_available_appointment_slots(date) to authenticated;
+
+-- Recria a regra de criação: clientes só podem solicitar um slot aberto e livre.
+drop policy if exists "Patients can request appointments" on public.appointments;
+create policy "Patients can request appointments"
+on public.appointments for insert to authenticated
+with check (
+  public.appointment_matches_availability(scheduled_at, duration_minutes)
+  and (
+    public.is_staff()
+    or (auth.uid() = patient_id and status = 'requested')
+  )
+);
+
+do $$
+begin
+  alter publication supabase_realtime add table public.appointment_availability;
+exception when duplicate_object then null;
+end;
+$$;

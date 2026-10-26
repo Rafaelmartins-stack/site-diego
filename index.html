@@ -129,10 +129,28 @@
       .agenda-dashboard .intro-copy { max-width: 740px; margin: 0 0 29px; color: #eee4d2; line-height: 1.6; }
       .agenda-dashboard .eyebrow { color: #d7bd78; }
       .agenda-dashboard h2 { margin-bottom: 12px; }
-      .agenda-grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: 18px; align-items: start; }
+      .agenda-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
       .agenda-card, .portal-card { padding: 24px; border: 1px solid rgba(215, 189, 120, .28); border-radius: 18px; background: rgba(255, 250, 240, .06); }
       .agenda-card h3, .portal-card h3 { margin: 0 0 16px; font-family: "Playfair Display", serif; font-size: 1.45rem; }
       .agenda-form { display: grid; gap: 12px; }
+      .availability-card { grid-column: 1 / -1; border-color: rgba(215, 189, 120, .42); background: linear-gradient(135deg, rgba(255, 250, 240, .1), rgba(215, 189, 120, .06)); }
+      .availability-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 17px; }
+      .availability-card-header p { max-width: 620px; margin: 3px 0 0; color: #eee4d2; font-size: .84rem; line-height: 1.5; }
+      .availability-form-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+      .availability-form-grid .agenda-field:last-of-type { grid-column: span 2; }
+      .weekday-picker { display: flex; flex-wrap: wrap; gap: 7px; grid-column: 1 / -1; }
+      .weekday-choice { position: relative; display: inline-flex; }
+      .weekday-choice input { position: absolute; opacity: 0; pointer-events: none; }
+      .weekday-choice span { min-width: 42px; padding: 9px 10px; border: 1px solid rgba(215, 189, 120, .42); border-radius: 999px; color: #eee4d2; cursor: pointer; font-size: .75rem; font-weight: 700; text-align: center; transition: .18s ease; }
+      .weekday-choice input:checked + span { border-color: #d7bd78; background: #d7bd78; color: #211e19; }
+      .weekday-choice input:focus-visible + span { outline: 3px solid rgba(215,189,120,.25); outline-offset: 2px; }
+      .availability-actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; grid-column: 1 / -1; margin-top: 4px; }
+      .availability-actions .agenda-feedback { margin: 0; }
+      .availability-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 10px; margin-top: 20px; }
+      .availability-item { display: grid; gap: 7px; padding: 14px; border: 1px solid rgba(215, 189, 120, .26); border-radius: 13px; background: rgba(0, 0, 0, .16); }
+      .availability-item strong { color: #fffaf0; font-size: .9rem; }
+      .availability-item span { color: #eee4d2; font-size: .8rem; }
+      .availability-item button { width: fit-content; padding: 0; border: 0; background: transparent; color: #e5ba90; cursor: pointer; font: inherit; font-size: .76rem; font-weight: 700; }
       .agenda-field { display: grid; gap: 7px; color: #fffaf0; font-size: .83rem; font-weight: 600; }
       .agenda-field input, .agenda-field select, .agenda-field textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #816b40; border-radius: 9px; outline: none; background: #312b22; color: #fffaf0; font: inherit; font-weight: 400; }
       .agenda-field textarea { min-height: 88px; resize: vertical; }
@@ -159,13 +177,26 @@
       .calendar-week, .calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
       .calendar-week { margin-bottom: 6px; color: #d7bd78; font-size: .64rem; font-weight: 700; text-align: center; text-transform: uppercase; }
       .calendar-day { display: grid; aspect-ratio: 1; place-items: center; border: 1px solid transparent; border-radius: 9px; background: transparent; color: #fffaf0; cursor: pointer; font: inherit; font-size: .78rem; }
+      .calendar-day { position: relative; }
+      .calendar-day.is-available::after { position: absolute; right: 5px; bottom: 5px; width: 4px; height: 4px; border-radius: 50%; background: #f3d994; content: ""; }
       .calendar-day:not(:disabled):hover, .calendar-day.is-selected { border-color: #d7bd78; background: rgba(215, 189, 120, .18); }
+      .calendar-day.is-selected::after { background: #fffaf0; }
       .calendar-day:disabled { color: rgba(238, 228, 210, .3); cursor: not-allowed; }
       .portal-form { display: grid; gap: 12px; margin-top: 18px; }
       .portal-form label { display: grid; gap: 7px; color: #fffaf0; font-size: .82rem; font-weight: 600; }
       .portal-form select, .portal-form textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid rgba(215, 189, 120, .5); border-radius: 9px; outline: none; background: rgba(0, 0, 0, .24); color: #fffaf0; font: inherit; }
       .portal-form textarea { min-height: 72px; resize: vertical; }
       .portal-form select:focus, .portal-form textarea:focus { border-color: #f3d994; box-shadow: 0 0 0 3px rgba(215,189,120,.14); }
+      .time-slot-field { display: grid; gap: 9px; }
+      .time-slot-label { margin: 0; color: #fffaf0; font-size: .82rem; font-weight: 600; }
+      .time-slot-help { margin: -3px 0 1px; color: #d8c8a9; font-size: .75rem; line-height: 1.4; }
+      .time-slot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(106px, 1fr)); gap: 8px; }
+      .time-slot { display: grid; gap: 2px; min-height: 52px; padding: 8px 10px; border: 1px solid rgba(215, 189, 120, .36); border-radius: 11px; background: rgba(0, 0, 0, .16); color: #fffaf0; cursor: pointer; font: inherit; text-align: left; transition: transform .18s, background .18s, border-color .18s; }
+      .time-slot:hover { transform: translateY(-2px); border-color: #f3d994; background: rgba(215, 189, 120, .14); }
+      .time-slot.is-selected { border-color: #f3d994; background: #d7bd78; color: #211e19; box-shadow: 0 6px 16px rgba(0,0,0,.16); }
+      .time-slot strong { font-size: .87rem; }
+      .time-slot small { opacity: .75; font-size: .66rem; }
+      .time-slot-empty { grid-column: 1 / -1; margin: 0; padding: 12px; border: 1px dashed rgba(215,189,120,.3); border-radius: 10px; color: #d8c8a9; font-size: .79rem; line-height: 1.45; }
       .portal-card .appointment-item, .portal-card .note-item { background: rgba(0, 0, 0, .18); }
       .portal-card .appointment-item span, .portal-card .note-item p { color: #eee4d2; }
       .portal-empty { margin: 0; color: #d8c8a9; font-size: .85rem; line-height: 1.5; }
@@ -346,6 +377,8 @@
         .staff-field.full, .photo-editors { grid-column: auto; }
         .image-editor-grid { grid-template-columns: 1fr; }
         .agenda-grid, .portal-grid { grid-template-columns: 1fr; }
+        .availability-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .availability-form-grid .agenda-field:last-of-type { grid-column: auto; }
       }
       @media (max-width: 700px) {
         .team-grid.team-profile { grid-template-columns: 1fr; gap: 24px; }
@@ -369,6 +402,8 @@
         .editor-bottom { align-items: flex-start; flex-direction: column; }
         .agenda-dashboard, .patient-portal { padding: 37px 0; }
         .agenda-card, .portal-card { padding: 19px; }
+        .availability-card-header, .availability-actions { align-items: flex-start; flex-direction: column; }
+        .availability-actions .btn { width: 100%; }
         .portal-heading { align-items: flex-start; flex-direction: column; }
         .mode-switch { right: 13px; bottom: 13px; min-height: 42px; padding: 0 14px; font-size: .75rem; }
         body.staff-mode .mode-switch { bottom: 67px; }
@@ -494,8 +529,33 @@
       <div class="container">
         <p class="eyebrow">Modo agenda</p>
         <h2>Consultas, clientes e acompanhamento.</h2>
-        <p class="intro-copy">Crie horários, escolha o cliente e registre as orientações dadas na consulta. Esses dados ficam visíveis apenas para a equipe e para o respectivo paciente no portal.</p>
+        <p class="intro-copy">Abra sua agenda por dia ou por período, escolha o cliente e registre as orientações dadas na consulta. Cada pessoa vê apenas os horários que você liberou e os próprios dados no portal.</p>
         <div class="agenda-grid">
+          <div class="agenda-card availability-card">
+            <div class="availability-card-header">
+              <div><h3>Liberar horários</h3><p>Defina um dia específico ou um período. Por exemplo: de segunda a sexta, das 9h às 18h, com consultas de até 1h30.</p></div>
+            </div>
+            <form class="agenda-form" id="availability-form">
+              <div class="availability-form-grid">
+                <label class="agenda-field">A partir de<input id="availability-start-date" type="date" required /></label>
+                <label class="agenda-field">Até<input id="availability-end-date" type="date" required /></label>
+                <label class="agenda-field">Início<input id="availability-start-time" type="time" value="09:00" required /></label>
+                <label class="agenda-field">Fim<input id="availability-end-time" type="time" value="18:00" required /></label>
+                <label class="agenda-field">Duração de cada consulta<select id="availability-duration" required><option value="30">30 minutos</option><option value="45">45 minutos</option><option value="60" selected>1 hora</option><option value="90">1 hora e 30 minutos</option></select></label>
+                <div class="weekday-picker" aria-label="Dias da semana">
+                  <label class="weekday-choice"><input type="checkbox" value="1" checked /><span>Seg</span></label>
+                  <label class="weekday-choice"><input type="checkbox" value="2" checked /><span>Ter</span></label>
+                  <label class="weekday-choice"><input type="checkbox" value="3" checked /><span>Qua</span></label>
+                  <label class="weekday-choice"><input type="checkbox" value="4" checked /><span>Qui</span></label>
+                  <label class="weekday-choice"><input type="checkbox" value="5" checked /><span>Sex</span></label>
+                  <label class="weekday-choice"><input type="checkbox" value="6" /><span>Sáb</span></label>
+                  <label class="weekday-choice"><input type="checkbox" value="0" /><span>Dom</span></label>
+                </div>
+                <div class="availability-actions"><p class="agenda-feedback" id="availability-feedback" aria-live="polite"></p><button class="btn btn-primary" type="submit">Liberar horários</button></div>
+              </div>
+            </form>
+            <div class="availability-list" id="availability-list"><p class="portal-empty">Carregando horários liberados…</p></div>
+          </div>
           <div class="agenda-card">
             <h3>Adicionar consulta</h3>
             <form class="agenda-form" id="staff-appointment-form">
@@ -548,7 +608,8 @@
             <div class="calendar-days" id="patient-calendar" aria-label="Calendário para solicitação de consulta"></div>
             <form class="portal-form" id="patient-appointment-form">
               <input id="patient-selected-date" type="hidden" required />
-              <label>Horário<select id="patient-appointment-time" required></select></label>
+              <input id="patient-appointment-time" type="hidden" required />
+              <div class="time-slot-field"><p class="time-slot-label">Escolha seu horário</p><p class="time-slot-help" id="patient-time-slot-help">Selecione uma data disponível para ver os horários.</p><div class="time-slot-grid" id="patient-time-slots" aria-live="polite"><p class="time-slot-empty">Os horários aparecerão aqui.</p></div></div>
               <label>Mensagem para a equipe (opcional)<textarea id="patient-appointment-message" placeholder="Conte brevemente o que você gostaria de trabalhar"></textarea></label>
               <button class="btn btn-primary" type="submit">Solicitar este horário</button>
               <p class="portal-feedback" id="patient-appointment-feedback" aria-live="polite"></p>
@@ -828,9 +889,14 @@
       let isRemoteSyncing = false;
       let remoteSyncQueued = false;
       const staffEmails = new Set(['familiarafael00@gmail.com', 'r.martins140111@gmail.com']);
-      const appointmentTimes = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'];
+      const clinicTimeZone = 'America/Sao_Paulo';
       let staffPatients = [];
       let staffAppointments = [];
+      let staffAvailability = [];
+      let staffAvailableSlots = [];
+      let patientAvailability = [];
+      let patientAvailableSlots = [];
+      let patientSelectedDuration = 0;
       let patientCalendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
       let selectedPatientDate = '';
       let patientRealtimeChannel = null;
@@ -1246,8 +1312,25 @@
       function formatAppointmentDate(value) {
         if (!value) return 'Data a confirmar';
         return new Intl.DateTimeFormat('pt-BR', {
-          weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+          weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: clinicTimeZone
         }).format(new Date(value)).replace('.', '');
+      }
+
+      function formatAvailabilityDate(value) {
+        return new Intl.DateTimeFormat('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })
+          .format(new Date(value + 'T12:00:00')).replace('.', '');
+      }
+
+      function formatDuration(minutes) {
+        return minutes === 60 ? '1 hora' : minutes === 90 ? '1h30' : minutes + ' min';
+      }
+
+      function normalizeSlotTime(value) {
+        return String(value || '').slice(0, 5);
+      }
+
+      function appointmentIso(date, time) {
+        return new Date(date + 'T' + time + ':00-03:00').toISOString();
       }
 
       function statusLabel(status) {
@@ -1259,16 +1342,64 @@
         })[status] || 'Em análise';
       }
 
-      function fillTimeSelect(select, placeholder) {
+      function fillTimeSelect(select, placeholder, slots = []) {
         if (!select) return;
-        select.innerHTML = '<option value="">' + placeholder + '</option>' + appointmentTimes.map((time) => '<option value="' + time + '">' + time + '</option>').join('');
+        select.innerHTML = '<option value="">' + placeholder + '</option>' + slots.map((slot) => {
+          const time = normalizeSlotTime(slot.start_time);
+          return '<option value="' + time + '" data-duration="' + Number(slot.duration_minutes) + '">' + time + ' · ' + formatDuration(Number(slot.duration_minutes)) + '</option>';
+        }).join('');
+      }
+
+      function renderPatientTimeSlots() {
+        const list = document.getElementById('patient-time-slots');
+        const help = document.getElementById('patient-time-slot-help');
+        const selectedTimeInput = document.getElementById('patient-appointment-time');
+        if (!list || !help || !selectedTimeInput) return;
+        if (!selectedPatientDate) {
+          help.textContent = 'Selecione uma data disponível para ver os horários.';
+          list.innerHTML = '<p class="time-slot-empty">Os horários aparecerão aqui.</p>';
+          return;
+        }
+        if (!patientAvailableSlots.length) {
+          help.textContent = 'Não há mais horários livres nesta data.';
+          list.innerHTML = '<p class="time-slot-empty">Todos os horários deste dia já foram reservados. Escolha outra data.</p>';
+          return;
+        }
+        help.textContent = 'Escolha um horário livre. A duração aparece em cada opção.';
+        list.innerHTML = patientAvailableSlots.map((slot) => {
+          const time = normalizeSlotTime(slot.start_time);
+          const duration = Number(slot.duration_minutes);
+          const selected = time === selectedTimeInput.value ? ' is-selected' : '';
+          return '<button class="time-slot' + selected + '" type="button" data-patient-time-slot="' + time + '" data-duration="' + duration + '" aria-pressed="' + (selected ? 'true' : 'false') + '"><strong>' + time + '</strong><small>' + formatDuration(duration) + '</small></button>';
+        }).join('');
+      }
+
+      async function loadAvailableSlots(date, target = 'patient') {
+        if (!supabaseClient || !date) return [];
+        const { data, error } = await supabaseClient.rpc('get_available_appointment_slots', { target_date: date });
+        if (error) throw error;
+        const slots = data || [];
+        if (target === 'staff') {
+          staffAvailableSlots = slots;
+          fillTimeSelect(document.getElementById('staff-appointment-time'), 'Escolha o horário liberado', slots);
+        } else {
+          patientAvailableSlots = slots;
+          const selectedTimeInput = document.getElementById('patient-appointment-time');
+          if (!slots.some((slot) => normalizeSlotTime(slot.start_time) === selectedTimeInput.value)) {
+            selectedTimeInput.value = '';
+            patientSelectedDuration = 0;
+          }
+          renderPatientTimeSlots();
+        }
+        return slots;
       }
 
       function agendaSetupMessage(error) {
         if (!error) return 'Não foi possível carregar a agenda.';
-        if (error.code === '42P01' || error.code === 'PGRST205') {
+        if (error.code === '42P01' || error.code === 'PGRST205' || error.code === '42883') {
           return 'A agenda ainda não foi ativada no Supabase. Execute o arquivo supabase-setup.sql atualizado no SQL Editor.';
         }
+        if (error.code === '42501') return 'Esse horário não está mais disponível. Atualize a data e escolha outra opção.';
         return 'Não foi possível carregar os dados da agenda. Tente novamente em instantes.';
       }
 
@@ -1308,7 +1439,24 @@
           const confirmAction = appointment.status === 'requested'
             ? '<button class="appointment-action" type="button" data-confirm-appointment="' + appointment.id + '">Confirmar</button>'
             : '';
-          return '<article class="appointment-item"><strong>' + patientName + '</strong><span>' + formatAppointmentDate(appointment.scheduled_at) + '</span>' + message + '<div class="appointment-meta"><span class="status-pill">' + statusLabel(appointment.status) + '</span>' + confirmAction + '</div></article>';
+          const duration = appointment.duration_minutes ? ' · ' + formatDuration(Number(appointment.duration_minutes)) : '';
+          return '<article class="appointment-item"><strong>' + patientName + '</strong><span>' + formatAppointmentDate(appointment.scheduled_at) + duration + '</span>' + message + '<div class="appointment-meta"><span class="status-pill">' + statusLabel(appointment.status) + '</span>' + confirmAction + '</div></article>';
+        }).join('');
+      }
+
+      function renderStaffAvailability() {
+        const list = document.getElementById('availability-list');
+        if (!list) return;
+        if (!staffAvailability.length) {
+          list.innerHTML = '<p class="portal-empty">Nenhum horário liberado ainda. Use o formulário acima para abrir a agenda.</p>';
+          return;
+        }
+        list.innerHTML = staffAvailability.map((availability) => {
+          const date = escapeHtml(formatAvailabilityDate(availability.available_date));
+          const start = escapeHtml(normalizeSlotTime(availability.start_time));
+          const end = escapeHtml(normalizeSlotTime(availability.end_time));
+          const duration = escapeHtml(formatDuration(Number(availability.slot_minutes)));
+          return '<article class="availability-item"><strong>' + date + '</strong><span>' + start + ' às ' + end + ' · consultas de ' + duration + '</span><button type="button" data-close-availability="' + availability.id + '">Fechar agenda deste dia</button></article>';
         }).join('');
       }
 
@@ -1318,20 +1466,24 @@
           if (list) list.innerHTML = '<p class="portal-empty">Não foi possível conectar à agenda.</p>';
           return;
         }
-        const [profilesResult, appointmentsResult] = await Promise.all([
+        const [profilesResult, appointmentsResult, availabilityResult] = await Promise.all([
           supabaseClient.from('patient_profiles').select('id, full_name, email').order('full_name', { ascending: true }),
-          supabaseClient.from('appointments').select('id, patient_id, scheduled_at, status, patient_message, patient_profiles(full_name, email)').order('scheduled_at', { ascending: true }).limit(60)
+          supabaseClient.from('appointments').select('id, patient_id, scheduled_at, duration_minutes, status, patient_message, patient_profiles(full_name, email)').order('scheduled_at', { ascending: true }).limit(60),
+          supabaseClient.from('appointment_availability').select('id, available_date, start_time, end_time, slot_minutes').gte('available_date', toLocalDateISO(new Date())).order('available_date', { ascending: true }).limit(90)
         ]);
-        if (profilesResult.error || appointmentsResult.error) {
-          const message = agendaSetupMessage(profilesResult.error || appointmentsResult.error);
+        if (profilesResult.error || appointmentsResult.error || availabilityResult.error) {
+          const message = agendaSetupMessage(profilesResult.error || appointmentsResult.error || availabilityResult.error);
           if (list) list.innerHTML = '<p class="portal-empty">' + escapeHtml(message) + '</p>';
           document.getElementById('staff-appointment-feedback').textContent = message;
+          document.getElementById('availability-feedback').textContent = message;
           return;
         }
         staffPatients = profilesResult.data || [];
         staffAppointments = appointmentsResult.data || [];
+        staffAvailability = availabilityResult.data || [];
         populateStaffPatientSelects();
         renderStaffAppointments();
+        renderStaffAvailability();
       }
 
       async function ensurePatientProfile(user) {
@@ -1353,7 +1505,8 @@
         }
         list.innerHTML = appointments.map((appointment) => {
           const message = appointment.patient_message ? '<p>' + escapeHtml(appointment.patient_message) + '</p>' : '';
-          return '<article class="appointment-item"><strong>' + formatAppointmentDate(appointment.scheduled_at) + '</strong><span class="status-pill">' + statusLabel(appointment.status) + '</span>' + message + '</article>';
+          const duration = appointment.duration_minutes ? ' · ' + formatDuration(Number(appointment.duration_minutes)) : '';
+          return '<article class="appointment-item"><strong>' + formatAppointmentDate(appointment.scheduled_at) + duration + '</strong><span class="status-pill">' + statusLabel(appointment.status) + '</span>' + message + '</article>';
         }).join('');
       }
 
@@ -1385,9 +1538,11 @@
         const cells = Array.from({ length: firstDay }, () => '<span></span>');
         for (let day = 1; day <= totalDays; day += 1) {
           const value = toLocalDateISO(new Date(year, month, day));
-          const disabled = value < today ? ' disabled' : '';
+          const available = patientAvailability.some((item) => item.available_date === value);
+          const disabled = value < today || !available ? ' disabled' : '';
           const selected = value === selectedPatientDate ? ' is-selected' : '';
-          cells.push('<button class="calendar-day' + selected + '" type="button" data-calendar-date="' + value + '"' + disabled + '>' + day + '</button>');
+          const availabilityClass = available ? ' is-available' : '';
+          cells.push('<button class="calendar-day' + availabilityClass + selected + '" type="button" data-calendar-date="' + value + '"' + disabled + '>' + day + '</button>');
         }
         patientCalendar.innerHTML = cells.join('');
       }
@@ -1396,11 +1551,26 @@
         try {
           const profile = await ensurePatientProfile(user);
           document.getElementById('patient-portal-name').textContent = profile.full_name || 'paciente';
-          const [appointmentsResult, notesResult] = await Promise.all([
-            supabaseClient.from('appointments').select('id, scheduled_at, status, patient_message').eq('patient_id', user.id).order('scheduled_at', { ascending: false }),
-            supabaseClient.from('consultation_notes').select('id, consultation_summary, training_plan, diet_plan, recorded_at').eq('patient_id', user.id).order('recorded_at', { ascending: false })
+          const [appointmentsResult, notesResult, availabilityResult] = await Promise.all([
+            supabaseClient.from('appointments').select('id, scheduled_at, duration_minutes, status, patient_message').eq('patient_id', user.id).order('scheduled_at', { ascending: false }),
+            supabaseClient.from('consultation_notes').select('id, consultation_summary, training_plan, diet_plan, recorded_at').eq('patient_id', user.id).order('recorded_at', { ascending: false }),
+            supabaseClient.from('appointment_availability').select('available_date, start_time, end_time, slot_minutes').gte('available_date', toLocalDateISO(new Date())).order('available_date', { ascending: true }).limit(180)
           ]);
-          if (appointmentsResult.error || notesResult.error) throw (appointmentsResult.error || notesResult.error);
+          if (appointmentsResult.error || notesResult.error || availabilityResult.error) throw (appointmentsResult.error || notesResult.error || availabilityResult.error);
+          patientAvailability = availabilityResult.data || [];
+          if (selectedPatientDate && !patientAvailability.some((item) => item.available_date === selectedPatientDate)) {
+            selectedPatientDate = '';
+            patientSelectedDate.value = '';
+            document.getElementById('patient-appointment-time').value = '';
+            patientSelectedDuration = 0;
+          }
+          renderPatientCalendar();
+          if (selectedPatientDate) {
+            await loadAvailableSlots(selectedPatientDate);
+          } else {
+            patientAvailableSlots = [];
+            renderPatientTimeSlots();
+          }
           renderPatientAppointments(appointmentsResult.data || []);
           renderPatientNotes(notesResult.data || []);
         } catch (error) {
@@ -1440,12 +1610,19 @@
           .on('postgres_changes', {
             event: '*', schema: 'public', table: 'consultation_notes', filter: 'patient_id=eq.' + user.id
           }, () => loadPatientPortal(user))
+          .on('postgres_changes', {
+            event: '*', schema: 'public', table: 'appointment_availability'
+          }, () => loadPatientPortal(user))
           .subscribe();
       }
 
-      fillTimeSelect(document.getElementById('staff-appointment-time'), 'Escolha o horário');
-      fillTimeSelect(document.getElementById('patient-appointment-time'), 'Escolha o horário');
-      document.getElementById('staff-appointment-date').min = toLocalDateISO(new Date());
+      fillTimeSelect(document.getElementById('staff-appointment-time'), 'Escolha primeiro a data');
+      const todayForAgenda = toLocalDateISO(new Date());
+      document.getElementById('staff-appointment-date').min = todayForAgenda;
+      document.getElementById('availability-start-date').min = todayForAgenda;
+      document.getElementById('availability-end-date').min = todayForAgenda;
+      document.getElementById('availability-start-date').value = todayForAgenda;
+      document.getElementById('availability-end-date').value = todayForAgenda;
       renderPatientCalendar();
 
       loadClinicContentFromSupabase();
@@ -1574,6 +1751,24 @@
       });
       document.getElementById('editor-entry').addEventListener('click', () => grantAccess('staff', 'editor'));
       document.getElementById('agenda-entry').addEventListener('click', () => grantAccess('staff', 'agenda'));
+      document.getElementById('availability-start-date').addEventListener('change', (event) => {
+        const endInput = document.getElementById('availability-end-date');
+        endInput.min = event.target.value || todayForAgenda;
+        if (endInput.value && endInput.value < event.target.value) endInput.value = event.target.value;
+      });
+      document.getElementById('staff-appointment-date').addEventListener('change', async (event) => {
+        const feedbackElement = document.getElementById('staff-appointment-feedback');
+        const select = document.getElementById('staff-appointment-time');
+        if (!event.target.value) return;
+        fillTimeSelect(select, 'Carregando horários…');
+        try {
+          await loadAvailableSlots(event.target.value, 'staff');
+          if (!staffAvailableSlots.length) feedbackElement.textContent = 'Não há horários livres liberados para esta data.';
+        } catch (error) {
+          fillTimeSelect(select, 'Não foi possível carregar');
+          feedbackElement.textContent = agendaSetupMessage(error);
+        }
+      });
       patientLogin.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (!supabaseClient) {
@@ -1628,13 +1823,32 @@
         patientCalendarCursor = new Date(patientCalendarCursor.getFullYear(), patientCalendarCursor.getMonth() + 1, 1);
         renderPatientCalendar();
       });
-      patientCalendar.addEventListener('click', (event) => {
+      patientCalendar.addEventListener('click', async (event) => {
         const button = event.target.closest('[data-calendar-date]');
         if (!button || button.disabled) return;
         selectedPatientDate = button.dataset.calendarDate;
         patientSelectedDate.value = selectedPatientDate;
-        patientAppointmentFeedback.textContent = 'Data selecionada: ' + new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(selectedPatientDate + 'T12:00:00'));
+        document.getElementById('patient-appointment-time').value = '';
+        patientSelectedDuration = 0;
+        patientAvailableSlots = [];
+        renderPatientTimeSlots();
+        patientAppointmentFeedback.textContent = 'Carregando horários para ' + new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(selectedPatientDate + 'T12:00:00')) + '…';
         renderPatientCalendar();
+        try {
+          await loadAvailableSlots(selectedPatientDate);
+          patientAppointmentFeedback.textContent = patientAvailableSlots.length
+            ? 'Data selecionada. Escolha um dos horários disponíveis.'
+            : 'Não há mais horários livres nesta data. Escolha outro dia.';
+        } catch (error) {
+          patientAppointmentFeedback.textContent = agendaSetupMessage(error);
+        }
+      });
+      document.getElementById('patient-time-slots').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-patient-time-slot]');
+        if (!button) return;
+        document.getElementById('patient-appointment-time').value = button.dataset.patientTimeSlot;
+        patientSelectedDuration = Number(button.dataset.duration);
+        renderPatientTimeSlots();
       });
       document.getElementById('patient-appointment-form').addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -1643,7 +1857,7 @@
           return;
         }
         const time = document.getElementById('patient-appointment-time').value;
-        if (!time) {
+        if (!time || !patientSelectedDuration) {
           patientAppointmentFeedback.textContent = 'Escolha um horário para continuar.';
           return;
         }
@@ -1655,7 +1869,8 @@
         patientAppointmentFeedback.textContent = 'Enviando solicitação…';
         const { error } = await supabaseClient.from('appointments').insert({
           patient_id: user.id,
-          scheduled_at: new Date(selectedPatientDate + 'T' + time + ':00').toISOString(),
+          scheduled_at: appointmentIso(selectedPatientDate, time),
+          duration_minutes: patientSelectedDuration,
           status: 'requested',
           patient_message: document.getElementById('patient-appointment-message').value.trim()
         });
@@ -1666,8 +1881,60 @@
           return;
         }
         document.getElementById('patient-appointment-message').value = '';
+        document.getElementById('patient-appointment-time').value = '';
+        patientSelectedDuration = 0;
         patientAppointmentFeedback.textContent = 'Solicitação enviada. A equipe confirmará seu horário em breve.';
         await loadPatientPortal(user);
+      });
+      document.getElementById('availability-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const startDate = document.getElementById('availability-start-date').value;
+        const endDate = document.getElementById('availability-end-date').value;
+        const startTime = document.getElementById('availability-start-time').value;
+        const endTime = document.getElementById('availability-end-time').value;
+        const slotMinutes = Number(document.getElementById('availability-duration').value);
+        const selectedWeekdays = [...document.querySelectorAll('.weekday-choice input:checked')].map((input) => Number(input.value));
+        const feedbackElement = document.getElementById('availability-feedback');
+        if (!startDate || !endDate || endDate < startDate) {
+          feedbackElement.textContent = 'Escolha um período válido para liberar a agenda.';
+          return;
+        }
+        if (!startTime || !endTime || startTime >= endTime || ((Number(endTime.slice(0, 2)) * 60 + Number(endTime.slice(3))) - (Number(startTime.slice(0, 2)) * 60 + Number(startTime.slice(3)))) < slotMinutes) {
+          feedbackElement.textContent = 'O período precisa comportar pelo menos uma consulta inteira.';
+          return;
+        }
+        if (!selectedWeekdays.length) {
+          feedbackElement.textContent = 'Selecione ao menos um dia da semana.';
+          return;
+        }
+        const records = [];
+        const cursor = new Date(startDate + 'T12:00:00');
+        const end = new Date(endDate + 'T12:00:00');
+        while (cursor <= end) {
+          if (selectedWeekdays.includes(cursor.getDay())) {
+            records.push({
+              available_date: toLocalDateISO(cursor),
+              start_time: startTime,
+              end_time: endTime,
+              slot_minutes: slotMinutes
+            });
+          }
+          cursor.setDate(cursor.getDate() + 1);
+        }
+        if (!records.length) {
+          feedbackElement.textContent = 'Nenhum dos dias escolhidos existe neste período.';
+          return;
+        }
+        feedbackElement.textContent = 'Liberando ' + records.length + (records.length === 1 ? ' dia…' : ' dias…');
+        const { error } = await supabaseClient
+          .from('appointment_availability')
+          .upsert(records, { onConflict: 'available_date' });
+        if (error) {
+          feedbackElement.textContent = agendaSetupMessage(error);
+          return;
+        }
+        feedbackElement.textContent = records.length + (records.length === 1 ? ' dia liberado.' : ' dias liberados.') + ' O portal já foi atualizado.';
+        await loadStaffAgenda();
       });
       document.getElementById('staff-appointment-form').addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -1676,14 +1943,20 @@
         const time = document.getElementById('staff-appointment-time').value;
         const feedbackElement = document.getElementById('staff-appointment-feedback');
         if (!patientId || !date || !time) {
-          feedbackElement.textContent = 'Escolha cliente, data e horário para salvar.';
+          feedbackElement.textContent = 'Escolha cliente, data e um horário liberado para salvar.';
+          return;
+        }
+        const selectedSlot = staffAvailableSlots.find((slot) => normalizeSlotTime(slot.start_time) === time);
+        if (!selectedSlot) {
+          feedbackElement.textContent = 'Atualize a data e escolha um horário liberado.';
           return;
         }
         const { data: { user } } = await supabaseClient.auth.getUser();
         feedbackElement.textContent = 'Salvando consulta…';
         const { error } = await supabaseClient.from('appointments').insert({
           patient_id: patientId,
-          scheduled_at: new Date(date + 'T' + time + ':00').toISOString(),
+          scheduled_at: appointmentIso(date, time),
+          duration_minutes: Number(selectedSlot.duration_minutes),
           status: document.getElementById('staff-appointment-status').value,
           created_by: user?.id || null
         });
@@ -1722,6 +1995,22 @@
         document.getElementById('staff-note-summary').value = '';
         document.getElementById('staff-note-training').value = '';
         document.getElementById('staff-note-diet').value = '';
+      });
+      document.getElementById('availability-list').addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-close-availability]');
+        if (!button) return;
+        button.disabled = true;
+        const { error } = await supabaseClient
+          .from('appointment_availability')
+          .delete()
+          .eq('id', button.dataset.closeAvailability);
+        if (error) {
+          document.getElementById('availability-feedback').textContent = agendaSetupMessage(error);
+          button.disabled = false;
+          return;
+        }
+        document.getElementById('availability-feedback').textContent = 'A agenda deste dia foi fechada para novas solicitações.';
+        await loadStaffAgenda();
       });
       document.getElementById('staff-appointments-list').addEventListener('click', async (event) => {
         const button = event.target.closest('[data-confirm-appointment]');
