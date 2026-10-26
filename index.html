@@ -76,12 +76,12 @@
       .role-icon { display: grid; flex: 0 0 auto; width: 42px; height: 42px; place-items: center; border-radius: 50%; background: var(--sage); font-size: 1.18rem; }
       .role-option strong { display: block; margin-bottom: 2px; font-size: .97rem; }
       .role-option span:not(.role-icon) { color: var(--muted); font-size: .82rem; }
-      .staff-login { display: grid; gap: 14px; }
-      .staff-login[hidden], .role-select[hidden] { display: none; }
+      .access-form { display: grid; gap: 14px; }
+      .access-form[hidden], .role-select[hidden], .staff-workspace[hidden], .client-choice[hidden] { display: none; }
       .back-button { width: fit-content; margin: 0 0 3px; padding: 0; border: 0; background: none; color: var(--leaf); cursor: pointer; font-size: .87rem; font-weight: 700; }
-      .staff-login label { color: var(--ink); font-size: .84rem; font-weight: 600; }
-      .staff-login input { width: 100%; margin-top: 7px; padding: 13px 14px; border: 1px solid var(--line); border-radius: 9px; outline: none; background: #fff; color: var(--ink); font: inherit; }
-      .staff-login input:focus { border-color: var(--leaf); box-shadow: 0 0 0 3px rgba(170,138,76,.14); }
+      .access-form label { color: var(--ink); font-size: .84rem; font-weight: 600; }
+      .access-form input { width: 100%; margin-top: 7px; padding: 13px 14px; border: 1px solid var(--line); border-radius: 9px; outline: none; background: #fff; color: var(--ink); font: inherit; }
+      .access-form input:focus { border-color: var(--leaf); box-shadow: 0 0 0 3px rgba(170,138,76,.14); }
       .access-feedback { min-height: 20px; margin: 0; color: #b44735; font-size: .83rem; line-height: 1.45; }
       .access-disclaimer { margin: 4px 0 0; color: var(--muted); font-size: .73rem; line-height: 1.45; }
       .staff-status { position: fixed; right: 18px; bottom: 18px; z-index: 20; display: none; align-items: center; gap: 9px; padding: 11px 15px; border: 1px solid var(--line); border-radius: 99px; background: rgba(255, 253, 248, .92); box-shadow: 0 10px 25px rgba(23,21,18,.1); color: var(--leaf); font-size: .8rem; font-weight: 700; }
@@ -92,8 +92,9 @@
       .mode-switch:focus-visible { outline: 3px solid rgba(170, 138, 76, .35); outline-offset: 3px; }
       body:not(.access-gated) .mode-switch { display: inline-flex; }
       body.staff-mode .mode-switch { bottom: 72px; }
-      .staff-dashboard { display: none; padding: 48px 0; background: #211e19; color: white; }
-      body.staff-mode .staff-dashboard { display: block; animation: staff-panel-in .55s ease both; }
+      .staff-dashboard, .agenda-dashboard, .patient-portal { display: none; }
+      .staff-dashboard, .agenda-dashboard { padding: 48px 0; background: #211e19; color: white; }
+      body.staff-editor-mode .staff-dashboard, body.staff-agenda-mode .agenda-dashboard, body.patient-mode .patient-portal { display: block; animation: staff-panel-in .55s ease both; }
       @keyframes staff-panel-in { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
       .staff-dashboard .eyebrow { color: #d7bd78; }
       .staff-dashboard h2 { margin-bottom: 12px; }
@@ -111,11 +112,11 @@
       .editor-feedback { min-height: 20px; margin: 0; color: #d7bd78; font-size: .83rem; line-height: 1.45; }
       .inline-editor-hint { grid-column: 1 / -1; margin: 0; padding: 15px 17px; border: 1px solid rgba(215, 189, 120, .45); border-radius: 12px; background: rgba(255, 250, 240, .06); color: #eee4d2; font-size: .88rem; line-height: 1.55; }
       .inline-editor-hint strong { color: #fffaf0; }
-      body.staff-mode [data-inline-text], body.staff-mode [data-inline-field] { position: relative; cursor: text; outline: 1px dashed rgba(170, 138, 76, .72); outline-offset: 4px; border-radius: 3px; transition: outline-color .18s, background .18s; }
-      body.staff-mode [data-inline-text]:hover, body.staff-mode [data-inline-field]:hover { outline-color: var(--terracotta); background: rgba(255, 253, 248, .45); }
-      body.staff-mode [data-inline-text]:focus, body.staff-mode [data-inline-field]:focus { outline: 2px solid var(--terracotta); outline-offset: 5px; background: rgba(255, 253, 248, .72); }
-      body.staff-mode img[data-site-image], body.staff-mode img[data-professional-photo] { cursor: pointer; outline: 2px dashed rgba(170, 138, 76, .78); outline-offset: -7px; filter: brightness(.96); transition: filter .2s, outline-color .2s; }
-      body.staff-mode img[data-site-image]:hover, body.staff-mode img[data-professional-photo]:hover { outline-color: var(--terracotta); filter: brightness(1.04); }
+      body.staff-editor-mode [data-inline-text], body.staff-editor-mode [data-inline-field] { position: relative; cursor: text; outline: 1px dashed rgba(170, 138, 76, .72); outline-offset: 4px; border-radius: 3px; transition: outline-color .18s, background .18s; }
+      body.staff-editor-mode [data-inline-text]:hover, body.staff-editor-mode [data-inline-field]:hover { outline-color: var(--terracotta); background: rgba(255, 253, 248, .45); }
+      body.staff-editor-mode [data-inline-text]:focus, body.staff-editor-mode [data-inline-field]:focus { outline: 2px solid var(--terracotta); outline-offset: 5px; background: rgba(255, 253, 248, .72); }
+      body.staff-editor-mode img[data-site-image], body.staff-editor-mode img[data-professional-photo] { cursor: pointer; outline: 2px dashed rgba(170, 138, 76, .78); outline-offset: -7px; filter: brightness(.96); transition: filter .2s, outline-color .2s; }
+      body.staff-editor-mode img[data-site-image]:hover, body.staff-editor-mode img[data-professional-photo]:hover { outline-color: var(--terracotta); filter: brightness(1.04); }
       .inline-image-input { display: none; }
       .photo-editors { grid-column: 1 / -1; }
       .photo-editor-heading { margin: 0 0 11px; color: #fffaf0; font-size: .9rem; font-weight: 700; }
@@ -125,6 +126,49 @@
       .photo-editor label { color: #fffaf0; font-size: .84rem; font-weight: 600; }
       .photo-editor input { display: block; width: 100%; margin-top: 7px; color: #eee4d2; font: inherit; font-size: .8rem; }
       .photo-editor small { display: block; margin-top: 6px; color: #d8c8a9; font-size: .75rem; line-height: 1.4; }
+      .agenda-dashboard .intro-copy { max-width: 740px; margin: 0 0 29px; color: #eee4d2; line-height: 1.6; }
+      .agenda-dashboard .eyebrow { color: #d7bd78; }
+      .agenda-dashboard h2 { margin-bottom: 12px; }
+      .agenda-grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: 18px; align-items: start; }
+      .agenda-card, .portal-card { padding: 24px; border: 1px solid rgba(215, 189, 120, .28); border-radius: 18px; background: rgba(255, 250, 240, .06); }
+      .agenda-card h3, .portal-card h3 { margin: 0 0 16px; font-family: "Playfair Display", serif; font-size: 1.45rem; }
+      .agenda-form { display: grid; gap: 12px; }
+      .agenda-field { display: grid; gap: 7px; color: #fffaf0; font-size: .83rem; font-weight: 600; }
+      .agenda-field input, .agenda-field select, .agenda-field textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #816b40; border-radius: 9px; outline: none; background: #312b22; color: #fffaf0; font: inherit; font-weight: 400; }
+      .agenda-field textarea { min-height: 88px; resize: vertical; }
+      .agenda-field input:focus, .agenda-field select:focus, .agenda-field textarea:focus { border-color: #d7bd78; box-shadow: 0 0 0 3px rgba(215,189,120,.14); }
+      .agenda-feedback, .portal-feedback { min-height: 20px; margin: 4px 0 0; color: #d7bd78; font-size: .82rem; line-height: 1.45; }
+      .appointment-list, .note-list { display: grid; gap: 10px; max-height: 540px; overflow: auto; }
+      .appointment-item, .note-item { padding: 14px; border: 1px solid rgba(215, 189, 120, .24); border-radius: 12px; background: rgba(0, 0, 0, .14); }
+      .appointment-item strong, .note-item strong { display: block; margin-bottom: 4px; color: #fffaf0; font-size: .92rem; }
+      .appointment-item span, .note-item p { margin: 0; color: #eee4d2; font-size: .82rem; line-height: 1.48; }
+      .appointment-meta { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin-top: 10px; }
+      .status-pill { display: inline-flex; width: fit-content; padding: 4px 8px; border-radius: 999px; background: rgba(215, 189, 120, .18); color: #f3d994; font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+      .appointment-action { padding: 5px 8px; border: 1px solid rgba(215, 189, 120, .45); border-radius: 7px; background: transparent; color: #fffaf0; cursor: pointer; font: inherit; font-size: .72rem; font-weight: 700; }
+      .appointment-action:hover { background: rgba(215, 189, 120, .15); }
+      .patient-portal { padding: 50px 0; background: linear-gradient(135deg, #211e19, #302a21); color: #fffaf0; }
+      .portal-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+      .portal-heading .eyebrow { color: #d7bd78; }
+      .portal-heading h2 { margin: 6px 0 9px; }
+      .portal-heading p { max-width: 660px; margin: 0; color: #eee4d2; line-height: 1.55; }
+      .portal-grid { display: grid; grid-template-columns: minmax(300px, .9fr) minmax(0, 1.1fr); gap: 18px; align-items: start; }
+      .portal-card { background: rgba(255, 253, 248, .06); }
+      .calendar-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+      .calendar-header strong { font-size: .92rem; text-transform: capitalize; }
+      .calendar-nav { display: grid; width: 32px; height: 32px; place-items: center; border: 1px solid rgba(215, 189, 120, .45); border-radius: 50%; background: transparent; color: #fffaf0; cursor: pointer; font: inherit; }
+      .calendar-week, .calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+      .calendar-week { margin-bottom: 6px; color: #d7bd78; font-size: .64rem; font-weight: 700; text-align: center; text-transform: uppercase; }
+      .calendar-day { display: grid; aspect-ratio: 1; place-items: center; border: 1px solid transparent; border-radius: 9px; background: transparent; color: #fffaf0; cursor: pointer; font: inherit; font-size: .78rem; }
+      .calendar-day:not(:disabled):hover, .calendar-day.is-selected { border-color: #d7bd78; background: rgba(215, 189, 120, .18); }
+      .calendar-day:disabled { color: rgba(238, 228, 210, .3); cursor: not-allowed; }
+      .portal-form { display: grid; gap: 12px; margin-top: 18px; }
+      .portal-form label { display: grid; gap: 7px; color: #fffaf0; font-size: .82rem; font-weight: 600; }
+      .portal-form select, .portal-form textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid rgba(215, 189, 120, .5); border-radius: 9px; outline: none; background: rgba(0, 0, 0, .24); color: #fffaf0; font: inherit; }
+      .portal-form textarea { min-height: 72px; resize: vertical; }
+      .portal-form select:focus, .portal-form textarea:focus { border-color: #f3d994; box-shadow: 0 0 0 3px rgba(215,189,120,.14); }
+      .portal-card .appointment-item, .portal-card .note-item { background: rgba(0, 0, 0, .18); }
+      .portal-card .appointment-item span, .portal-card .note-item p { color: #eee4d2; }
+      .portal-empty { margin: 0; color: #d8c8a9; font-size: .85rem; line-height: 1.5; }
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
         *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -301,6 +345,7 @@
         .editor-grid { grid-template-columns: 1fr; }
         .staff-field.full, .photo-editors { grid-column: auto; }
         .image-editor-grid { grid-template-columns: 1fr; }
+        .agenda-grid, .portal-grid { grid-template-columns: 1fr; }
       }
       @media (max-width: 700px) {
         .team-grid.team-profile { grid-template-columns: 1fr; gap: 24px; }
@@ -322,6 +367,9 @@
         .instagram-card { align-items: flex-start; flex-direction: column; padding: 29px; gap: 18px; }
         .instagram-post iframe { height: 510px; }
         .editor-bottom { align-items: flex-start; flex-direction: column; }
+        .agenda-dashboard, .patient-portal { padding: 37px 0; }
+        .agenda-card, .portal-card { padding: 19px; }
+        .portal-heading { align-items: flex-start; flex-direction: column; }
         .mode-switch { right: 13px; bottom: 13px; min-height: 42px; padding: 0 14px; font-size: .75rem; }
         body.staff-mode .mode-switch { bottom: 67px; }
         .person { max-width: 360px; }
@@ -349,11 +397,11 @@
           <h1 id="access-title">Como você deseja entrar?</h1>
           <p>Escolha seu perfil para continuar para a clínica.</p>
           <div class="role-options">
-            <button class="role-option" id="client-entry" type="button"><span class="role-icon" aria-hidden="true">♡</span><span><strong>Sou cliente</strong>Conhecer a clínica e agendar uma consulta</span></button>
+            <button class="role-option" id="client-entry" type="button"><span class="role-icon" aria-hidden="true">♡</span><span><strong>Sou cliente</strong>Acessar seu acompanhamento ou conhecer a clínica</span></button>
             <button class="role-option" id="employee-entry" type="button"><span class="role-icon" aria-hidden="true">✦</span><span><strong>Sou funcionário</strong>Acessar com e-mail e senha da equipe</span></button>
           </div>
         </div>
-        <form class="staff-login" id="staff-login" hidden>
+        <form class="access-form" id="staff-login" hidden>
           <button class="back-button" id="back-to-roles" type="button">← Voltar para perfis</button>
           <p class="eyebrow">Área da equipe</p>
           <h1>Identificação de funcionário.</h1>
@@ -363,6 +411,49 @@
           <button class="btn btn-primary" type="submit">Entrar no modo funcionário</button>
           <p class="access-feedback" id="access-feedback" aria-live="polite"></p>
           <p class="access-disclaimer">Acesso protegido pelo Supabase. Entre com uma conta de funcionário criada em Authentication.</p>
+        </form>
+        <div class="staff-workspace" id="staff-workspace" hidden>
+          <button class="back-button" id="back-to-staff-login" type="button">← Trocar conta</button>
+          <p class="eyebrow">Área da equipe</p>
+          <h1>Como você quer trabalhar?</h1>
+          <p>Escolha a ferramenta para esta sessão. Você pode trocar de modo a qualquer momento.</p>
+          <div class="role-options">
+            <button class="role-option" id="editor-entry" type="button"><span class="role-icon" aria-hidden="true">✎</span><span><strong>Modo editor</strong>Alterar textos, fotos e contatos visíveis no site</span></button>
+            <button class="role-option" id="agenda-entry" type="button"><span class="role-icon" aria-hidden="true">▣</span><span><strong>Modo agenda</strong>Organizar clientes, consultas e orientações</span></button>
+          </div>
+        </div>
+        <div class="client-choice" id="client-choice" hidden>
+          <button class="back-button" id="back-to-roles-from-client" type="button">← Voltar para perfis</button>
+          <p class="eyebrow">Portal do paciente</p>
+          <h1>Seu acompanhamento, no seu tempo.</h1>
+          <p>Entre para ver consultas, orientações e solicitar um novo horário — ou conheça a clínica sem conta.</p>
+          <div class="role-options">
+            <button class="role-option" id="client-login-entry" type="button"><span class="role-icon" aria-hidden="true">↗</span><span><strong>Entrar no portal</strong>Já tenho uma conta de paciente</span></button>
+            <button class="role-option" id="client-signup-entry" type="button"><span class="role-icon" aria-hidden="true">＋</span><span><strong>Criar conta</strong>Meu primeiro acesso ao acompanhamento</span></button>
+            <button class="role-option" id="client-browse-entry" type="button"><span class="role-icon" aria-hidden="true">♡</span><span><strong>Conhecer a clínica</strong>Navegar pelo site sem entrar no portal</span></button>
+          </div>
+        </div>
+        <form class="access-form" id="patient-login" hidden>
+          <button class="back-button" id="back-to-client-choice-login" type="button">← Voltar</button>
+          <p class="eyebrow">Portal do paciente</p>
+          <h1>Que bom ter você de volta.</h1>
+          <p>Use o e-mail e a senha cadastrados para acompanhar suas consultas.</p>
+          <label>Seu e-mail<input id="patient-email" type="email" autocomplete="email" required placeholder="voce@exemplo.com" /></label>
+          <label>Sua senha<input id="patient-password" type="password" autocomplete="current-password" required placeholder="Sua senha" /></label>
+          <button class="btn btn-primary" type="submit">Entrar no meu portal</button>
+          <p class="access-feedback" id="patient-login-feedback" aria-live="polite"></p>
+        </form>
+        <form class="access-form" id="patient-signup" hidden>
+          <button class="back-button" id="back-to-client-choice-signup" type="button">← Voltar</button>
+          <p class="eyebrow">Portal do paciente</p>
+          <h1>Crie seu acesso.</h1>
+          <p>Com uma conta você acompanha as orientações da consulta e solicita novos horários.</p>
+          <label>Seu nome completo<input id="patient-name-input" type="text" autocomplete="name" required placeholder="Nome e sobrenome" /></label>
+          <label>Seu e-mail<input id="patient-signup-email" type="email" autocomplete="email" required placeholder="voce@exemplo.com" /></label>
+          <label>Crie uma senha<input id="patient-signup-password" type="password" autocomplete="new-password" minlength="6" required placeholder="Mínimo de 6 caracteres" /></label>
+          <button class="btn btn-primary" type="submit">Criar minha conta</button>
+          <p class="access-feedback" id="patient-signup-feedback" aria-live="polite"></p>
+          <p class="access-disclaimer">Se a confirmação por e-mail estiver ativa, você receberá um link para validar sua conta antes de entrar.</p>
         </form>
       </div>
     </section>
@@ -396,6 +487,80 @@
           </div>
           <div class="editor-bottom"><p class="editor-feedback" id="editor-feedback" aria-live="polite"></p><button class="btn btn-primary" type="submit">Salvar dados da clínica</button></div>
         </form>
+      </div>
+    </section>
+
+    <section class="agenda-dashboard" id="agenda-dashboard" aria-label="Agenda e registros de clientes">
+      <div class="container">
+        <p class="eyebrow">Modo agenda</p>
+        <h2>Consultas, clientes e acompanhamento.</h2>
+        <p class="intro-copy">Crie horários, escolha o cliente e registre as orientações dadas na consulta. Esses dados ficam visíveis apenas para a equipe e para o respectivo paciente no portal.</p>
+        <div class="agenda-grid">
+          <div class="agenda-card">
+            <h3>Adicionar consulta</h3>
+            <form class="agenda-form" id="staff-appointment-form">
+              <label class="agenda-field">Cliente<select id="staff-appointment-patient" required><option value="">Carregando clientes…</option></select></label>
+              <label class="agenda-field">Data<input id="staff-appointment-date" type="date" required /></label>
+              <label class="agenda-field">Horário<select id="staff-appointment-time" required></select></label>
+              <label class="agenda-field">Status<select id="staff-appointment-status"><option value="confirmed">Confirmada</option><option value="requested">Solicitada</option><option value="completed">Concluída</option></select></label>
+              <button class="btn btn-primary" type="submit">Salvar consulta</button>
+              <p class="agenda-feedback" id="staff-appointment-feedback" aria-live="polite"></p>
+            </form>
+          </div>
+          <div class="agenda-card">
+            <h3>Registrar orientações</h3>
+            <form class="agenda-form" id="staff-note-form">
+              <label class="agenda-field">Cliente<select id="staff-note-patient" required><option value="">Carregando clientes…</option></select></label>
+              <label class="agenda-field">Resumo da consulta<textarea id="staff-note-summary" required placeholder="O que foi conversado e combinado nesta consulta"></textarea></label>
+              <label class="agenda-field">Treino / movimento<textarea id="staff-note-training" placeholder="Orientações de treino, movimento ou rotina"></textarea></label>
+              <label class="agenda-field">Plano alimentar<textarea id="staff-note-diet" placeholder="Orientações de alimentação e hábitos"></textarea></label>
+              <button class="btn btn-primary" type="submit">Salvar orientações</button>
+              <p class="agenda-feedback" id="staff-note-feedback" aria-live="polite"></p>
+            </form>
+          </div>
+          <div class="agenda-card" style="grid-column: 1 / -1;">
+            <h3>Próximas consultas</h3>
+            <div class="appointment-list" id="staff-appointments-list"><p class="portal-empty">Carregando agenda…</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="patient-portal" id="patient-portal" aria-label="Portal do paciente">
+      <div class="container">
+        <div class="portal-heading">
+          <div>
+            <p class="eyebrow">Portal do paciente</p>
+            <h2>Olá, <span id="patient-portal-name">paciente</span>.</h2>
+            <p>Acompanhe seus horários e orientações. Para um novo atendimento, escolha uma data disponível e envie sua solicitação.</p>
+          </div>
+          <button class="btn btn-outline" id="patient-logout-button" type="button">Sair do portal</button>
+        </div>
+        <div class="portal-grid">
+          <div class="portal-card">
+            <h3>Solicitar consulta</h3>
+            <div class="calendar-header">
+              <button class="calendar-nav" id="patient-calendar-prev" type="button" aria-label="Mês anterior">←</button>
+              <strong id="patient-calendar-title">Mês</strong>
+              <button class="calendar-nav" id="patient-calendar-next" type="button" aria-label="Próximo mês">→</button>
+            </div>
+            <div class="calendar-week" aria-hidden="true"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div>
+            <div class="calendar-days" id="patient-calendar" aria-label="Calendário para solicitação de consulta"></div>
+            <form class="portal-form" id="patient-appointment-form">
+              <input id="patient-selected-date" type="hidden" required />
+              <label>Horário<select id="patient-appointment-time" required></select></label>
+              <label>Mensagem para a equipe (opcional)<textarea id="patient-appointment-message" placeholder="Conte brevemente o que você gostaria de trabalhar"></textarea></label>
+              <button class="btn btn-primary" type="submit">Solicitar este horário</button>
+              <p class="portal-feedback" id="patient-appointment-feedback" aria-live="polite"></p>
+            </form>
+          </div>
+          <div class="portal-card">
+            <h3>Minhas consultas</h3>
+            <div class="appointment-list" id="patient-appointments-list"><p class="portal-empty">Carregando suas consultas…</p></div>
+            <h3 style="margin-top: 27px;">Minhas orientações</h3>
+            <div class="note-list" id="patient-notes-list"><p class="portal-empty">Carregando suas orientações…</p></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -617,9 +782,19 @@
       const accessScreen = document.getElementById('access-screen');
       const roleSelect = document.getElementById('role-select');
       const staffLogin = document.getElementById('staff-login');
+      const staffWorkspace = document.getElementById('staff-workspace');
+      const clientChoice = document.getElementById('client-choice');
+      const patientLogin = document.getElementById('patient-login');
+      const patientSignup = document.getElementById('patient-signup');
       const feedback = document.getElementById('access-feedback');
       const staffEmail = document.getElementById('staff-email');
       const staffPassword = document.getElementById('staff-password');
+      const patientLoginFeedback = document.getElementById('patient-login-feedback');
+      const patientSignupFeedback = document.getElementById('patient-signup-feedback');
+      const patientCalendar = document.getElementById('patient-calendar');
+      const patientCalendarTitle = document.getElementById('patient-calendar-title');
+      const patientSelectedDate = document.getElementById('patient-selected-date');
+      const patientAppointmentFeedback = document.getElementById('patient-appointment-feedback');
       const supabaseUrl = 'https://mxuzetneqbcdgybwfqwj.supabase.co';
       const supabasePublishableKey = 'sb_publishable_WdsXtYNvFvs-aqySTHFKTA_FFRPw9jq';
       const supabaseClient = window.supabase?.createClient
@@ -652,6 +827,13 @@
       let remoteSyncTimer = 0;
       let isRemoteSyncing = false;
       let remoteSyncQueued = false;
+      const staffEmails = new Set(['familiarafael00@gmail.com', 'r.martins140111@gmail.com']);
+      const appointmentTimes = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'];
+      let staffPatients = [];
+      let staffAppointments = [];
+      let patientCalendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      let selectedPatientDate = '';
+      let patientRealtimeChannel = null;
 
       function readLocalObject(key) {
         try {
@@ -861,7 +1043,7 @@
           element.contentEditable = 'false';
           element.spellcheck = false;
           element.addEventListener('input', () => {
-            if (!document.body.classList.contains('staff-mode')) return;
+            if (!document.body.classList.contains('staff-editor-mode')) return;
             const value = element.textContent.replace(/\s+/g, ' ').trim();
             editableTextContent[key] = value;
             document.querySelectorAll(`[data-inline-text="${key}"]`).forEach((target) => {
@@ -880,7 +1062,7 @@
           element.contentEditable = 'false';
           element.spellcheck = false;
           element.addEventListener('input', () => {
-            if (!document.body.classList.contains('staff-mode')) return;
+            if (!document.body.classList.contains('staff-editor-mode')) return;
             const value = element.textContent.replace(/\s+/g, ' ').trim();
             clinicContent = { ...clinicContent, [element.dataset.inlineField]: value };
             if (element.dataset.inlineField === 'appointmentMessage') {
@@ -902,7 +1084,7 @@
         document.querySelectorAll('img[data-site-image], img[data-professional-photo]').forEach((image) => {
           image.title = 'Clique para trocar esta foto';
           image.addEventListener('click', (event) => {
-            if (!document.body.classList.contains('staff-mode')) return;
+            if (!document.body.classList.contains('staff-editor-mode')) return;
             event.preventDefault();
             inlineImageTarget = image.hasAttribute('data-professional-photo')
               ? 'professionalPhoto'
@@ -1046,32 +1228,293 @@
         }, 700);
       }
 
+      function isStaffUser(user) {
+        return Boolean(user?.email && staffEmails.has(user.email.toLowerCase()));
+      }
+
+      function escapeHtml(value) {
+        return String(value || '').replace(/[&<>"']/g, (character) => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+        }[character]));
+      }
+
+      function toLocalDateISO(date) {
+        const offset = date.getTimezoneOffset();
+        return new Date(date.getTime() - offset * 60000).toISOString().slice(0, 10);
+      }
+
+      function formatAppointmentDate(value) {
+        if (!value) return 'Data a confirmar';
+        return new Intl.DateTimeFormat('pt-BR', {
+          weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        }).format(new Date(value)).replace('.', '');
+      }
+
+      function statusLabel(status) {
+        return ({
+          requested: 'Solicitada',
+          confirmed: 'Confirmada',
+          completed: 'Concluída',
+          cancelled: 'Cancelada'
+        })[status] || 'Em análise';
+      }
+
+      function fillTimeSelect(select, placeholder) {
+        if (!select) return;
+        select.innerHTML = '<option value="">' + placeholder + '</option>' + appointmentTimes.map((time) => '<option value="' + time + '">' + time + '</option>').join('');
+      }
+
+      function agendaSetupMessage(error) {
+        if (!error) return 'Não foi possível carregar a agenda.';
+        if (error.code === '42P01' || error.code === 'PGRST205') {
+          return 'A agenda ainda não foi ativada no Supabase. Execute o arquivo supabase-setup.sql atualizado no SQL Editor.';
+        }
+        return 'Não foi possível carregar os dados da agenda. Tente novamente em instantes.';
+      }
+
+      function profileFromAppointment(appointment) {
+        const profile = Array.isArray(appointment.patient_profiles)
+          ? appointment.patient_profiles[0]
+          : appointment.patient_profiles;
+        return profile || {};
+      }
+
+      function populateStaffPatientSelects() {
+        ['staff-appointment-patient', 'staff-note-patient'].forEach((id) => {
+          const select = document.getElementById(id);
+          if (!select) return;
+          const selected = select.value;
+          const options = staffPatients.map((patient) => {
+            const label = escapeHtml(patient.full_name || patient.email);
+            const email = patient.email ? ' · ' + escapeHtml(patient.email) : '';
+            return '<option value="' + patient.id + '">' + label + email + '</option>';
+          }).join('');
+          select.innerHTML = '<option value="">Escolha um cliente</option>' + options;
+          if (staffPatients.some((patient) => patient.id === selected)) select.value = selected;
+        });
+      }
+
+      function renderStaffAppointments() {
+        const list = document.getElementById('staff-appointments-list');
+        if (!list) return;
+        if (!staffAppointments.length) {
+          list.innerHTML = '<p class="portal-empty">Nenhuma consulta cadastrada ainda.</p>';
+          return;
+        }
+        list.innerHTML = staffAppointments.map((appointment) => {
+          const profile = profileFromAppointment(appointment);
+          const patientName = escapeHtml(profile.full_name || profile.email || 'Paciente');
+          const message = appointment.patient_message ? '<p>' + escapeHtml(appointment.patient_message) + '</p>' : '';
+          const confirmAction = appointment.status === 'requested'
+            ? '<button class="appointment-action" type="button" data-confirm-appointment="' + appointment.id + '">Confirmar</button>'
+            : '';
+          return '<article class="appointment-item"><strong>' + patientName + '</strong><span>' + formatAppointmentDate(appointment.scheduled_at) + '</span>' + message + '<div class="appointment-meta"><span class="status-pill">' + statusLabel(appointment.status) + '</span>' + confirmAction + '</div></article>';
+        }).join('');
+      }
+
+      async function loadStaffAgenda() {
+        const list = document.getElementById('staff-appointments-list');
+        if (!supabaseClient) {
+          if (list) list.innerHTML = '<p class="portal-empty">Não foi possível conectar à agenda.</p>';
+          return;
+        }
+        const [profilesResult, appointmentsResult] = await Promise.all([
+          supabaseClient.from('patient_profiles').select('id, full_name, email').order('full_name', { ascending: true }),
+          supabaseClient.from('appointments').select('id, patient_id, scheduled_at, status, patient_message, patient_profiles(full_name, email)').order('scheduled_at', { ascending: true }).limit(60)
+        ]);
+        if (profilesResult.error || appointmentsResult.error) {
+          const message = agendaSetupMessage(profilesResult.error || appointmentsResult.error);
+          if (list) list.innerHTML = '<p class="portal-empty">' + escapeHtml(message) + '</p>';
+          document.getElementById('staff-appointment-feedback').textContent = message;
+          return;
+        }
+        staffPatients = profilesResult.data || [];
+        staffAppointments = appointmentsResult.data || [];
+        populateStaffPatientSelects();
+        renderStaffAppointments();
+      }
+
+      async function ensurePatientProfile(user) {
+        const fullName = String(user.user_metadata?.full_name || user.email?.split('@')[0] || 'Paciente').trim();
+        const { data, error } = await supabaseClient
+          .from('patient_profiles')
+          .upsert({ id: user.id, full_name: fullName, email: user.email || '' }, { onConflict: 'id' })
+          .select('id, full_name, email')
+          .single();
+        if (error) throw error;
+        return data;
+      }
+
+      function renderPatientAppointments(appointments) {
+        const list = document.getElementById('patient-appointments-list');
+        if (!appointments.length) {
+          list.innerHTML = '<p class="portal-empty">Você ainda não tem consultas agendadas.</p>';
+          return;
+        }
+        list.innerHTML = appointments.map((appointment) => {
+          const message = appointment.patient_message ? '<p>' + escapeHtml(appointment.patient_message) + '</p>' : '';
+          return '<article class="appointment-item"><strong>' + formatAppointmentDate(appointment.scheduled_at) + '</strong><span class="status-pill">' + statusLabel(appointment.status) + '</span>' + message + '</article>';
+        }).join('');
+      }
+
+      function renderPatientNotes(notes) {
+        const list = document.getElementById('patient-notes-list');
+        if (!notes.length) {
+          list.innerHTML = '<p class="portal-empty">Assim que o profissional registrar as orientações, elas aparecerão aqui.</p>';
+          return;
+        }
+        list.innerHTML = notes.map((note) => {
+          const parts = [
+            note.consultation_summary && '<p><strong>Consulta:</strong> ' + escapeHtml(note.consultation_summary) + '</p>',
+            note.training_plan && '<p><strong>Treino e movimento:</strong> ' + escapeHtml(note.training_plan) + '</p>',
+            note.diet_plan && '<p><strong>Plano alimentar:</strong> ' + escapeHtml(note.diet_plan) + '</p>'
+          ].filter(Boolean).join('');
+          const date = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(note.recorded_at));
+          return '<article class="note-item"><strong>' + date + '</strong>' + parts + '</article>';
+        }).join('');
+      }
+
+      function renderPatientCalendar() {
+        const year = patientCalendarCursor.getFullYear();
+        const month = patientCalendarCursor.getMonth();
+        const monthStart = new Date(year, month, 1);
+        const firstDay = monthStart.getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const today = toLocalDateISO(new Date());
+        patientCalendarTitle.textContent = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(monthStart);
+        const cells = Array.from({ length: firstDay }, () => '<span></span>');
+        for (let day = 1; day <= totalDays; day += 1) {
+          const value = toLocalDateISO(new Date(year, month, day));
+          const disabled = value < today ? ' disabled' : '';
+          const selected = value === selectedPatientDate ? ' is-selected' : '';
+          cells.push('<button class="calendar-day' + selected + '" type="button" data-calendar-date="' + value + '"' + disabled + '>' + day + '</button>');
+        }
+        patientCalendar.innerHTML = cells.join('');
+      }
+
+      async function loadPatientPortal(user) {
+        try {
+          const profile = await ensurePatientProfile(user);
+          document.getElementById('patient-portal-name').textContent = profile.full_name || 'paciente';
+          const [appointmentsResult, notesResult] = await Promise.all([
+            supabaseClient.from('appointments').select('id, scheduled_at, status, patient_message').eq('patient_id', user.id).order('scheduled_at', { ascending: false }),
+            supabaseClient.from('consultation_notes').select('id, consultation_summary, training_plan, diet_plan, recorded_at').eq('patient_id', user.id).order('recorded_at', { ascending: false })
+          ]);
+          if (appointmentsResult.error || notesResult.error) throw (appointmentsResult.error || notesResult.error);
+          renderPatientAppointments(appointmentsResult.data || []);
+          renderPatientNotes(notesResult.data || []);
+        } catch (error) {
+          const message = agendaSetupMessage(error);
+          document.getElementById('patient-appointments-list').innerHTML = '<p class="portal-empty">' + escapeHtml(message) + '</p>';
+          document.getElementById('patient-notes-list').innerHTML = '<p class="portal-empty">As orientações aparecerão aqui quando a agenda estiver ativa.</p>';
+        }
+      }
+
+      async function openPatientPortal(user) {
+        if (isStaffUser(user)) {
+          await supabaseClient.auth.signOut();
+          patientLoginFeedback.textContent = 'Use a área de funcionário para acessar esta conta.';
+          return;
+        }
+        grantAccess('patient');
+        renderPatientCalendar();
+        await loadPatientPortal(user);
+        subscribeToPatientPortal(user);
+      }
+
+      async function unsubscribePatientPortal() {
+        if (patientRealtimeChannel && supabaseClient) {
+          await supabaseClient.removeChannel(patientRealtimeChannel);
+          patientRealtimeChannel = null;
+        }
+      }
+
+      async function subscribeToPatientPortal(user) {
+        await unsubscribePatientPortal();
+        if (!supabaseClient || !user) return;
+        patientRealtimeChannel = supabaseClient
+          .channel('patient-portal-' + user.id)
+          .on('postgres_changes', {
+            event: '*', schema: 'public', table: 'appointments', filter: 'patient_id=eq.' + user.id
+          }, () => loadPatientPortal(user))
+          .on('postgres_changes', {
+            event: '*', schema: 'public', table: 'consultation_notes', filter: 'patient_id=eq.' + user.id
+          }, () => loadPatientPortal(user))
+          .subscribe();
+      }
+
+      fillTimeSelect(document.getElementById('staff-appointment-time'), 'Escolha o horário');
+      fillTimeSelect(document.getElementById('patient-appointment-time'), 'Escolha o horário');
+      document.getElementById('staff-appointment-date').min = toLocalDateISO(new Date());
+      renderPatientCalendar();
+
       loadClinicContentFromSupabase();
       subscribeToClinicContent();
 
-      function grantAccess(mode) {
+      function grantAccess(mode, workspace = '') {
         accessScreen.classList.add('is-hidden');
-        document.body.classList.remove('access-gated');
-        document.body.classList.toggle('staff-mode', mode === 'staff');
-        setInlineEditing(mode === 'staff');
+        document.body.classList.remove('access-gated', 'staff-mode', 'staff-editor-mode', 'staff-agenda-mode', 'patient-mode');
         if (mode === 'staff') {
-          editorFeedback.textContent = 'Clique em um texto ou foto destacado para editar direto na página.';
+          document.body.classList.add('staff-mode', workspace === 'agenda' ? 'staff-agenda-mode' : 'staff-editor-mode');
+          setInlineEditing(workspace !== 'agenda');
+          if (workspace === 'agenda') {
+            loadStaffAgenda();
+          } else {
+            editorFeedback.textContent = 'Clique em um texto ou foto destacado para editar direto na página.';
+          }
+        } else if (mode === 'patient') {
+          document.body.classList.add('patient-mode');
+          setInlineEditing(false);
+        } else {
+          setInlineEditing(false);
         }
         setTimeout(() => {
           window.dispatchEvent(new Event('resize'));
         }, 50);
       }
 
-      function showRoleChoices() {
+      function hideAccessSteps() {
+        roleSelect.hidden = true;
         staffLogin.hidden = true;
+        staffWorkspace.hidden = true;
+        clientChoice.hidden = true;
+        patientLogin.hidden = true;
+        patientSignup.hidden = true;
+      }
+
+      function showRoleChoices() {
+        hideAccessSteps();
         roleSelect.hidden = false;
         feedback.textContent = '';
+        patientLoginFeedback.textContent = '';
+        patientSignupFeedback.textContent = '';
         staffLogin.reset();
+        patientLogin.reset();
+        patientSignup.reset();
+      }
+
+      function showStaffLogin() {
+        hideAccessSteps();
+        staffLogin.hidden = false;
+        feedback.textContent = 'Escolha a conta de funcionário informando o e-mail e a senha abaixo.';
+        staffLogin.reset();
+        staffEmail.focus();
+      }
+
+      function showClientChoice() {
+        hideAccessSteps();
+        clientChoice.hidden = false;
+      }
+
+      function showStaffWorkspace() {
+        hideAccessSteps();
+        staffWorkspace.hidden = false;
       }
 
       async function returnToRoleSelection() {
+        await unsubscribePatientPortal();
         if (supabaseClient) await supabaseClient.auth.signOut();
-        document.body.classList.remove('staff-mode');
+        document.body.classList.remove('staff-mode', 'staff-editor-mode', 'staff-agenda-mode', 'patient-mode');
         setInlineEditing(false);
         document.body.classList.add('access-gated');
         accessScreen.classList.remove('is-hidden');
@@ -1085,15 +1528,29 @@
         accessScreen.classList.add('is-ready');
       }, 1450);
 
-      document.getElementById('client-entry').addEventListener('click', () => grantAccess('client'));
-      document.getElementById('employee-entry').addEventListener('click', () => {
-        roleSelect.hidden = true;
-        staffLogin.hidden = false;
-        feedback.textContent = 'Escolha a conta de funcionário informando o e-mail e a senha abaixo.';
-        staffLogin.reset();
-        staffEmail.focus();
-      });
+      document.getElementById('client-entry').addEventListener('click', showClientChoice);
+      document.getElementById('employee-entry').addEventListener('click', showStaffLogin);
       document.getElementById('back-to-roles').addEventListener('click', showRoleChoices);
+      document.getElementById('back-to-roles-from-client').addEventListener('click', showRoleChoices);
+      document.getElementById('back-to-client-choice-login').addEventListener('click', showClientChoice);
+      document.getElementById('back-to-client-choice-signup').addEventListener('click', showClientChoice);
+      document.getElementById('back-to-staff-login').addEventListener('click', async () => {
+        if (supabaseClient) await supabaseClient.auth.signOut();
+        showStaffLogin();
+      });
+      document.getElementById('client-browse-entry').addEventListener('click', () => grantAccess('client'));
+      document.getElementById('client-login-entry').addEventListener('click', () => {
+        hideAccessSteps();
+        patientLogin.hidden = false;
+        patientLoginFeedback.textContent = '';
+        document.getElementById('patient-email').focus();
+      });
+      document.getElementById('client-signup-entry').addEventListener('click', () => {
+        hideAccessSteps();
+        patientSignup.hidden = false;
+        patientSignupFeedback.textContent = '';
+        document.getElementById('patient-name-input').focus();
+      });
       staffLogin.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (!supabaseClient) {
@@ -1101,20 +1558,186 @@
           return;
         }
         feedback.textContent = 'Entrando…';
-        const { error } = await supabaseClient.auth.signInWithPassword({
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
           email: staffEmail.value.trim(),
           password: staffPassword.value
         });
-        if (!error) {
-          grantAccess('staff');
+        if (!error && isStaffUser(data.user)) {
+          showStaffWorkspace();
+          feedback.textContent = '';
           await loadClinicContentFromSupabase();
           return;
         }
+        if (!error) await supabaseClient.auth.signOut();
         feedback.textContent = 'E-mail ou senha não conferem. Verifique os dados e tente novamente.';
         staffPassword.focus();
       });
+      document.getElementById('editor-entry').addEventListener('click', () => grantAccess('staff', 'editor'));
+      document.getElementById('agenda-entry').addEventListener('click', () => grantAccess('staff', 'agenda'));
+      patientLogin.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!supabaseClient) {
+          patientLoginFeedback.textContent = 'Não foi possível conectar ao serviço de acesso. Atualize a página e tente novamente.';
+          return;
+        }
+        patientLoginFeedback.textContent = 'Entrando…';
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: document.getElementById('patient-email').value.trim(),
+          password: document.getElementById('patient-password').value
+        });
+        if (error || !data.user) {
+          patientLoginFeedback.textContent = 'E-mail ou senha não conferem. Verifique os dados e tente novamente.';
+          return;
+        }
+        await openPatientPortal(data.user);
+      });
+      patientSignup.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!supabaseClient) {
+          patientSignupFeedback.textContent = 'Não foi possível conectar ao serviço de acesso. Atualize a página e tente novamente.';
+          return;
+        }
+        patientSignupFeedback.textContent = 'Criando sua conta…';
+        const { data, error } = await supabaseClient.auth.signUp({
+          email: document.getElementById('patient-signup-email').value.trim(),
+          password: document.getElementById('patient-signup-password').value,
+          options: { data: { full_name: document.getElementById('patient-name-input').value.trim() } }
+        });
+        if (error) {
+          patientSignupFeedback.textContent = error.message || 'Não foi possível criar a conta. Tente novamente.';
+          return;
+        }
+        if (!data.session) {
+          patientSignupFeedback.textContent = 'Conta criada. Confira seu e-mail para confirmar o acesso antes de entrar no portal.';
+          return;
+        }
+        await openPatientPortal(data.user);
+      });
       document.getElementById('logout-button').addEventListener('click', returnToRoleSelection);
       document.getElementById('mode-switch').addEventListener('click', returnToRoleSelection);
+      document.getElementById('patient-logout-button').addEventListener('click', returnToRoleSelection);
+      document.getElementById('patient-calendar-prev').addEventListener('click', () => {
+        const currentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const previousMonth = new Date(patientCalendarCursor.getFullYear(), patientCalendarCursor.getMonth() - 1, 1);
+        if (previousMonth >= currentMonth) {
+          patientCalendarCursor = previousMonth;
+          renderPatientCalendar();
+        }
+      });
+      document.getElementById('patient-calendar-next').addEventListener('click', () => {
+        patientCalendarCursor = new Date(patientCalendarCursor.getFullYear(), patientCalendarCursor.getMonth() + 1, 1);
+        renderPatientCalendar();
+      });
+      patientCalendar.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-calendar-date]');
+        if (!button || button.disabled) return;
+        selectedPatientDate = button.dataset.calendarDate;
+        patientSelectedDate.value = selectedPatientDate;
+        patientAppointmentFeedback.textContent = 'Data selecionada: ' + new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(selectedPatientDate + 'T12:00:00'));
+        renderPatientCalendar();
+      });
+      document.getElementById('patient-appointment-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!selectedPatientDate) {
+          patientAppointmentFeedback.textContent = 'Escolha uma data no calendário antes de solicitar.';
+          return;
+        }
+        const time = document.getElementById('patient-appointment-time').value;
+        if (!time) {
+          patientAppointmentFeedback.textContent = 'Escolha um horário para continuar.';
+          return;
+        }
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+          patientAppointmentFeedback.textContent = 'Sua sessão expirou. Entre no portal novamente.';
+          return;
+        }
+        patientAppointmentFeedback.textContent = 'Enviando solicitação…';
+        const { error } = await supabaseClient.from('appointments').insert({
+          patient_id: user.id,
+          scheduled_at: new Date(selectedPatientDate + 'T' + time + ':00').toISOString(),
+          status: 'requested',
+          patient_message: document.getElementById('patient-appointment-message').value.trim()
+        });
+        if (error) {
+          patientAppointmentFeedback.textContent = error.code === '23505'
+            ? 'Este horário acabou de ser reservado. Escolha outro, por favor.'
+            : agendaSetupMessage(error);
+          return;
+        }
+        document.getElementById('patient-appointment-message').value = '';
+        patientAppointmentFeedback.textContent = 'Solicitação enviada. A equipe confirmará seu horário em breve.';
+        await loadPatientPortal(user);
+      });
+      document.getElementById('staff-appointment-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const patientId = document.getElementById('staff-appointment-patient').value;
+        const date = document.getElementById('staff-appointment-date').value;
+        const time = document.getElementById('staff-appointment-time').value;
+        const feedbackElement = document.getElementById('staff-appointment-feedback');
+        if (!patientId || !date || !time) {
+          feedbackElement.textContent = 'Escolha cliente, data e horário para salvar.';
+          return;
+        }
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        feedbackElement.textContent = 'Salvando consulta…';
+        const { error } = await supabaseClient.from('appointments').insert({
+          patient_id: patientId,
+          scheduled_at: new Date(date + 'T' + time + ':00').toISOString(),
+          status: document.getElementById('staff-appointment-status').value,
+          created_by: user?.id || null
+        });
+        if (error) {
+          feedbackElement.textContent = error.code === '23505'
+            ? 'Já existe uma consulta neste horário. Escolha outro.'
+            : agendaSetupMessage(error);
+          return;
+        }
+        feedbackElement.textContent = 'Consulta salva e visível no portal do cliente.';
+        document.getElementById('staff-appointment-time').value = '';
+        await loadStaffAgenda();
+      });
+      document.getElementById('staff-note-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const patientId = document.getElementById('staff-note-patient').value;
+        const feedbackElement = document.getElementById('staff-note-feedback');
+        if (!patientId) {
+          feedbackElement.textContent = 'Escolha um cliente para registrar as orientações.';
+          return;
+        }
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        feedbackElement.textContent = 'Salvando orientações…';
+        const { error } = await supabaseClient.from('consultation_notes').insert({
+          patient_id: patientId,
+          consultation_summary: document.getElementById('staff-note-summary').value.trim(),
+          training_plan: document.getElementById('staff-note-training').value.trim(),
+          diet_plan: document.getElementById('staff-note-diet').value.trim(),
+          recorded_by: user?.id || null
+        });
+        if (error) {
+          feedbackElement.textContent = agendaSetupMessage(error);
+          return;
+        }
+        feedbackElement.textContent = 'Orientações salvas no portal do cliente.';
+        document.getElementById('staff-note-summary').value = '';
+        document.getElementById('staff-note-training').value = '';
+        document.getElementById('staff-note-diet').value = '';
+      });
+      document.getElementById('staff-appointments-list').addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-confirm-appointment]');
+        if (!button) return;
+        button.disabled = true;
+        const { error } = await supabaseClient
+          .from('appointments')
+          .update({ status: 'confirmed' })
+          .eq('id', button.dataset.confirmAppointment);
+        if (error) {
+          document.getElementById('staff-appointment-feedback').textContent = agendaSetupMessage(error);
+          button.disabled = false;
+          return;
+        }
+        await loadStaffAgenda();
+      });
 
       staffEditor.addEventListener('submit', async (event) => {
         event.preventDefault();
