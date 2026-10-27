@@ -138,6 +138,8 @@
       .agenda-dashboard .intro-copy { max-width: 740px; margin: 0 0 29px; color: #eee4d2; line-height: 1.6; }
       .agenda-dashboard .eyebrow { color: #d7bd78; }
       .agenda-dashboard h2 { margin-bottom: 12px; }
+      .sync-status { display: inline-flex; align-items: center; gap: 7px; margin: -15px 0 24px; color: #d8c8a9; font-size: .76rem; line-height: 1.4; }
+      .sync-status::before { width: 7px; height: 7px; border-radius: 50%; background: #d7bd78; box-shadow: 0 0 0 4px rgba(215, 189, 120, .12); content: ""; }
       .agenda-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
       .agenda-card, .portal-card { padding: 24px; border: 1px solid rgba(215, 189, 120, .28); border-radius: 18px; background: rgba(255, 250, 240, .06); }
       .agenda-card h3, .portal-card h3 { margin: 0 0 16px; font-family: "Playfair Display", serif; font-size: 1.45rem; }
@@ -169,6 +171,15 @@
       .availability-item strong { color: #fffaf0; font-size: .9rem; }
       .availability-item span { color: #eee4d2; font-size: .8rem; }
       .availability-item button { width: fit-content; padding: 0; border: 0; background: transparent; color: #e5ba90; cursor: pointer; font: inherit; font-size: .76rem; font-weight: 700; }
+      .staff-availability-calendar { padding: 17px; border: 1px solid rgba(215, 189, 120, .22); border-radius: 14px; background: rgba(0, 0, 0, .13); }
+      .staff-calendar-week, .staff-calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+      .staff-calendar-week { margin-bottom: 6px; color: #d7bd78; font-size: .64rem; font-weight: 700; text-align: center; text-transform: uppercase; }
+      .staff-calendar-day { display: grid; aspect-ratio: 1; place-items: center; border: 1px solid transparent; border-radius: 9px; background: transparent; color: rgba(238, 228, 210, .46); font-size: .77rem; }
+      .staff-calendar-day.is-open { position: relative; border-color: #d7bd78; background: rgba(215, 189, 120, .2); color: #fffaf0; cursor: pointer; font: inherit; font-weight: 700; transition: transform .18s, background .18s, border-color .18s; }
+      .staff-calendar-day.is-open::after { position: absolute; right: 5px; bottom: 5px; width: 5px; height: 5px; border-radius: 50%; background: #f3d994; content: ""; }
+      .staff-calendar-day.is-open:hover { transform: translateY(-2px); border-color: #fffaf0; background: rgba(215, 189, 120, .35); }
+      .staff-calendar-day.is-open:focus-visible { outline: 3px solid rgba(243, 217, 148, .3); outline-offset: 2px; }
+      .staff-calendar-help { margin: 13px 0 0; color: #d8c8a9; font-size: .75rem; line-height: 1.45; }
       .agenda-field { display: grid; gap: 7px; color: #fffaf0; font-size: .83rem; font-weight: 600; }
       .agenda-field input, .agenda-field select, .agenda-field textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #816b40; border-radius: 9px; outline: none; background: #312b22; color: #fffaf0; font: inherit; font-weight: 400; }
       .agenda-field textarea { min-height: 88px; resize: vertical; }
@@ -553,6 +564,7 @@
         <p class="eyebrow">Modo agenda</p>
         <h2>Consultas, clientes e acompanhamento.</h2>
         <p class="intro-copy">Abra sua agenda por dia ou por período, escolha o cliente e registre as orientações dadas na consulta. Cada pessoa vê apenas os horários que você liberou e os próprios dados no portal.</p>
+        <p class="sync-status" id="staff-sync-status" aria-live="polite">Atualização automática ativa.</p>
         <div class="agenda-grid">
           <div class="agenda-card availability-card">
             <div class="availability-card-header">
@@ -591,8 +603,17 @@
                 <div class="availability-actions"><p class="agenda-feedback" id="availability-feedback" aria-live="polite"></p><button class="btn btn-primary" type="submit">Liberar horários</button></div>
               </div>
             </form>
-            <div class="availability-list-heading"><h4>Próximas datas abertas</h4><span class="availability-count" id="availability-open-count">Carregando…</span></div>
-            <div class="availability-list" id="availability-list"><p class="portal-empty">Carregando horários liberados…</p></div>
+            <div class="availability-list-heading"><h4>Fechar dias de trabalho</h4><span class="availability-count" id="availability-open-count">Carregando…</span></div>
+            <div class="staff-availability-calendar" id="staff-availability-calendar">
+              <div class="calendar-header">
+                <button class="calendar-nav" id="staff-calendar-prev" type="button" aria-label="Mês anterior">←</button>
+                <strong id="staff-calendar-title">Mês</strong>
+                <button class="calendar-nav" id="staff-calendar-next" type="button" aria-label="Próximo mês">→</button>
+              </div>
+              <div class="staff-calendar-week" aria-hidden="true"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div>
+              <div class="staff-calendar-days" id="staff-calendar-days" aria-label="Calendário de dias de atendimento"></div>
+              <p class="staff-calendar-help">Os dias dourados estão abertos para agendamento. Clique em um deles para fechar somente aquele dia; consultas já marcadas são preservadas.</p>
+            </div>
           </div>
           <div class="agenda-card">
             <h3>Adicionar consulta</h3>
@@ -631,6 +652,7 @@
             <p class="eyebrow">Portal do paciente</p>
             <h2>Olá, <span id="patient-portal-name">paciente</span>.</h2>
             <p>Acompanhe seus horários e orientações. Para um novo atendimento, escolha uma data disponível e envie sua solicitação.</p>
+            <p class="sync-status" id="patient-sync-status" aria-live="polite">Atualização automática ativa.</p>
           </div>
           <button class="btn btn-outline" id="patient-logout-button" type="button">Sair do portal</button>
         </div>
@@ -938,6 +960,13 @@
       let patientCalendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
       let selectedPatientDate = '';
       let patientRealtimeChannel = null;
+      let staffRealtimeChannel = null;
+      let activePatientUser = null;
+      let patientAutoRefreshTimer = 0;
+      let staffAutoRefreshTimer = 0;
+      let staffRefreshDebounceTimer = 0;
+      let patientRefreshDebounceTimer = 0;
+      let staffCalendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
       function readLocalObject(key) {
         try {
@@ -1363,6 +1392,13 @@
         return minutes === 60 ? '1 hora' : minutes === 90 ? '1h30' : minutes + ' min';
       }
 
+      function updateSyncStatus(elementId, prefix = 'Atualização automática ativa') {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        const time = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(new Date());
+        element.textContent = prefix + ' · atualizado às ' + time + '.';
+      }
+
       function updateAvailabilityPreview() {
         const preview = document.getElementById('availability-preview');
         if (!preview) return;
@@ -1520,23 +1556,35 @@
       }
 
       function renderStaffAvailability() {
-        const list = document.getElementById('availability-list');
+        const calendar = document.getElementById('staff-calendar-days');
+        const title = document.getElementById('staff-calendar-title');
+        const previousButton = document.getElementById('staff-calendar-prev');
         const count = document.getElementById('availability-open-count');
-        if (!list) return;
+        if (!calendar || !title) return;
         if (count) count.textContent = staffAvailability.length
           ? staffAvailability.length + (staffAvailability.length === 1 ? ' data aberta' : ' datas abertas')
           : 'Nenhuma data aberta';
-        if (!staffAvailability.length) {
-          list.innerHTML = '<p class="portal-empty">Nenhum horário liberado ainda. Use o formulário acima para abrir a agenda.</p>';
-          return;
+        const year = staffCalendarCursor.getFullYear();
+        const month = staffCalendarCursor.getMonth();
+        const monthStart = new Date(year, month, 1);
+        const currentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const previousMonth = new Date(year, month - 1, 1);
+        title.textContent = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(monthStart);
+        if (previousButton) previousButton.disabled = previousMonth < currentMonth;
+        const availabilityByDate = new Map(staffAvailability.map((item) => [item.available_date, item]));
+        const cells = Array.from({ length: monthStart.getDay() }, () => '<span aria-hidden="true"></span>');
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        for (let day = 1; day <= totalDays; day += 1) {
+          const date = toLocalDateISO(new Date(year, month, day));
+          const availability = availabilityByDate.get(date);
+          if (!availability) {
+            cells.push('<span class="staff-calendar-day" aria-label="' + day + '">' + day + '</span>');
+            continue;
+          }
+          const label = escapeHtml(formatAvailabilityDate(date) + ', ' + normalizeSlotTime(availability.start_time) + ' às ' + normalizeSlotTime(availability.end_time));
+          cells.push('<button class="staff-calendar-day is-open" type="button" data-close-availability="' + availability.id + '" data-availability-date="' + date + '" aria-label="Fechar agenda de ' + label + '" title="Fechar agenda de ' + label + '">' + day + '</button>');
         }
-        list.innerHTML = staffAvailability.map((availability) => {
-          const date = escapeHtml(formatAvailabilityDate(availability.available_date));
-          const start = escapeHtml(normalizeSlotTime(availability.start_time));
-          const end = escapeHtml(normalizeSlotTime(availability.end_time));
-          const duration = escapeHtml(formatDuration(Number(availability.slot_minutes)));
-          return '<article class="availability-item"><strong>' + date + '</strong><span>' + start + ' às ' + end + ' · consultas de ' + duration + '</span><button type="button" data-close-availability="' + availability.id + '">Fechar agenda deste dia</button></article>';
-        }).join('');
+        calendar.innerHTML = cells.join('');
       }
 
       async function loadStaffAgenda() {
@@ -1548,7 +1596,7 @@
         const [profilesResult, appointmentsResult, availabilityResult] = await Promise.all([
           supabaseClient.from('patient_profiles').select('id, full_name, email').order('full_name', { ascending: true }),
           supabaseClient.from('appointments').select('id, patient_id, scheduled_at, duration_minutes, status, patient_message, patient_profiles(full_name, email)').order('scheduled_at', { ascending: true }).limit(60),
-          supabaseClient.from('appointment_availability').select('id, available_date, start_time, end_time, slot_minutes').gte('available_date', toLocalDateISO(new Date())).order('available_date', { ascending: true }).limit(90)
+          supabaseClient.from('appointment_availability').select('id, available_date, start_time, end_time, slot_minutes').gte('available_date', toLocalDateISO(new Date())).order('available_date', { ascending: true }).limit(365)
         ]);
         if (profilesResult.error || appointmentsResult.error || availabilityResult.error) {
           const message = agendaSetupMessage(profilesResult.error || appointmentsResult.error || availabilityResult.error);
@@ -1563,6 +1611,7 @@
         populateStaffPatientSelects();
         renderStaffAppointments();
         renderStaffAvailability();
+        updateSyncStatus('staff-sync-status');
       }
 
       async function ensurePatientProfile(user) {
@@ -1574,6 +1623,16 @@
           .single();
         if (error) throw error;
         return data;
+      }
+
+      async function getPatientProfile(user) {
+        const { data, error } = await supabaseClient
+          .from('patient_profiles')
+          .select('id, full_name, email')
+          .eq('id', user.id)
+          .maybeSingle();
+        if (error) throw error;
+        return data || ensurePatientProfile(user);
       }
 
       function renderPatientAppointments(appointments) {
@@ -1628,7 +1687,7 @@
 
       async function loadPatientPortal(user) {
         try {
-          const profile = await ensurePatientProfile(user);
+          const profile = await getPatientProfile(user);
           document.getElementById('patient-portal-name').textContent = profile.full_name || 'paciente';
           const [appointmentsResult, notesResult, availabilityResult] = await Promise.all([
             supabaseClient.from('appointments').select('id, scheduled_at, duration_minutes, status, patient_message').eq('patient_id', user.id).order('scheduled_at', { ascending: false }),
@@ -1652,6 +1711,7 @@
           }
           renderPatientAppointments(appointmentsResult.data || []);
           renderPatientNotes(notesResult.data || []);
+          updateSyncStatus('patient-sync-status');
         } catch (error) {
           const message = agendaSetupMessage(error);
           document.getElementById('patient-appointments-list').innerHTML = '<p class="portal-empty">' + escapeHtml(message) + '</p>';
@@ -1665,34 +1725,84 @@
           patientLoginFeedback.textContent = 'Use a área de funcionário para acessar esta conta.';
           return;
         }
+        activePatientUser = user;
         grantAccess('patient');
         renderPatientCalendar();
         await loadPatientPortal(user);
-        subscribeToPatientPortal(user);
+        await subscribeToPatientPortal(user);
       }
 
       async function unsubscribePatientPortal() {
+        window.clearTimeout(patientRefreshDebounceTimer);
+        window.clearInterval(patientAutoRefreshTimer);
+        patientRefreshDebounceTimer = 0;
+        patientAutoRefreshTimer = 0;
+        activePatientUser = null;
         if (patientRealtimeChannel && supabaseClient) {
           await supabaseClient.removeChannel(patientRealtimeChannel);
           patientRealtimeChannel = null;
         }
       }
 
+      function queuePatientPortalRefresh() {
+        window.clearTimeout(patientRefreshDebounceTimer);
+        patientRefreshDebounceTimer = window.setTimeout(() => {
+          if (activePatientUser && document.body.classList.contains('patient-mode')) loadPatientPortal(activePatientUser);
+        }, 350);
+      }
+
       async function subscribeToPatientPortal(user) {
-        await unsubscribePatientPortal();
+        if (patientRealtimeChannel && supabaseClient) await supabaseClient.removeChannel(patientRealtimeChannel);
+        window.clearInterval(patientAutoRefreshTimer);
         if (!supabaseClient || !user) return;
         patientRealtimeChannel = supabaseClient
           .channel('patient-portal-' + user.id)
           .on('postgres_changes', {
             event: '*', schema: 'public', table: 'appointments', filter: 'patient_id=eq.' + user.id
-          }, () => loadPatientPortal(user))
+          }, queuePatientPortalRefresh)
           .on('postgres_changes', {
             event: '*', schema: 'public', table: 'consultation_notes', filter: 'patient_id=eq.' + user.id
-          }, () => loadPatientPortal(user))
+          }, queuePatientPortalRefresh)
           .on('postgres_changes', {
             event: '*', schema: 'public', table: 'appointment_availability'
-          }, () => loadPatientPortal(user))
+          }, queuePatientPortalRefresh)
           .subscribe();
+        patientAutoRefreshTimer = window.setInterval(() => {
+          if (activePatientUser && document.body.classList.contains('patient-mode')) loadPatientPortal(activePatientUser);
+        }, 45000);
+      }
+
+      async function unsubscribeStaffAgenda() {
+        window.clearTimeout(staffRefreshDebounceTimer);
+        window.clearInterval(staffAutoRefreshTimer);
+        staffRefreshDebounceTimer = 0;
+        staffAutoRefreshTimer = 0;
+        if (staffRealtimeChannel && supabaseClient) {
+          await supabaseClient.removeChannel(staffRealtimeChannel);
+          staffRealtimeChannel = null;
+        }
+      }
+
+      function queueStaffAgendaRefresh() {
+        window.clearTimeout(staffRefreshDebounceTimer);
+        staffRefreshDebounceTimer = window.setTimeout(() => {
+          if (document.body.classList.contains('staff-agenda-mode')) loadStaffAgenda();
+        }, 350);
+      }
+
+      async function subscribeToStaffAgenda() {
+        await unsubscribeStaffAgenda();
+        if (!supabaseClient) return;
+        staffRealtimeChannel = supabaseClient
+          .channel('staff-agenda')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'patient_profiles' }, queueStaffAgendaRefresh)
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, queueStaffAgendaRefresh)
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'consultation_notes' }, queueStaffAgendaRefresh)
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'appointment_availability' }, queueStaffAgendaRefresh)
+          .subscribe();
+        staffAutoRefreshTimer = window.setInterval(() => {
+          if (document.body.classList.contains('staff-agenda-mode')) loadStaffAgenda();
+        }, 45000);
       }
 
       fillTimeSelect(document.getElementById('staff-appointment-time'), 'Escolha primeiro a data');
@@ -1719,6 +1829,7 @@
           setInlineEditing(workspace !== 'agenda');
           if (workspace === 'agenda') {
             loadStaffAgenda();
+            subscribeToStaffAgenda();
           } else {
             editorFeedback.textContent = 'Clique em um texto ou foto destacado para editar direto na página.';
           }
@@ -1773,6 +1884,7 @@
 
       async function returnToRoleSelection() {
         await unsubscribePatientPortal();
+        await unsubscribeStaffAgenda();
         if (supabaseClient) await supabaseClient.auth.signOut();
         document.body.classList.remove('staff-mode', 'staff-editor-mode', 'staff-agenda-mode', 'patient-mode');
         setInlineEditing(false);
@@ -1914,6 +2026,18 @@
       document.getElementById('patient-calendar-next').addEventListener('click', () => {
         patientCalendarCursor = new Date(patientCalendarCursor.getFullYear(), patientCalendarCursor.getMonth() + 1, 1);
         renderPatientCalendar();
+      });
+      document.getElementById('staff-calendar-prev').addEventListener('click', () => {
+        const currentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const previousMonth = new Date(staffCalendarCursor.getFullYear(), staffCalendarCursor.getMonth() - 1, 1);
+        if (previousMonth >= currentMonth) {
+          staffCalendarCursor = previousMonth;
+          renderStaffAvailability();
+        }
+      });
+      document.getElementById('staff-calendar-next').addEventListener('click', () => {
+        staffCalendarCursor = new Date(staffCalendarCursor.getFullYear(), staffCalendarCursor.getMonth() + 1, 1);
+        renderStaffAvailability();
       });
       patientCalendar.addEventListener('click', async (event) => {
         const button = event.target.closest('[data-calendar-date]');
@@ -2088,9 +2212,11 @@
         document.getElementById('staff-note-training').value = '';
         document.getElementById('staff-note-diet').value = '';
       });
-      document.getElementById('availability-list').addEventListener('click', async (event) => {
+      document.getElementById('staff-availability-calendar').addEventListener('click', async (event) => {
         const button = event.target.closest('[data-close-availability]');
         if (!button) return;
+        const formattedDate = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(button.dataset.availabilityDate + 'T12:00:00'));
+        if (!window.confirm('Fechar a agenda de ' + formattedDate + '? Consultas já marcadas serão preservadas.')) return;
         button.disabled = true;
         const { error } = await supabaseClient
           .from('appointment_availability')
