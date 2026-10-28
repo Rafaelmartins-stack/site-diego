@@ -232,6 +232,55 @@
       .portal-card .appointment-item, .portal-card .note-item { background: rgba(0, 0, 0, .18); }
       .portal-card .appointment-item span, .portal-card .note-item p { color: #eee4d2; }
       .portal-empty { margin: 0; color: #d8c8a9; font-size: .85rem; line-height: 1.5; }
+      /* Tema claro exclusivo para a agenda da equipe: branco, creme e dourado suave. */
+      body.staff-agenda-mode .agenda-dashboard { background: #fffdf8; color: var(--ink); }
+      body.staff-agenda-mode .agenda-dashboard .eyebrow { color: #aa8a4c; }
+      body.staff-agenda-mode .agenda-dashboard .intro-copy { color: #675d4f; }
+      body.staff-agenda-mode .sync-status { color: #756d61; }
+      body.staff-agenda-mode .sync-status::before { background: #c5a55c; box-shadow: 0 0 0 4px rgba(197, 165, 92, .13); }
+      body.staff-agenda-mode .agenda-card { border-color: #e4ddcf; background: #ffffff; box-shadow: 0 12px 30px rgba(23, 21, 18, .06); }
+      body.staff-agenda-mode .availability-card { border-color: rgba(170, 138, 76, .38); background: linear-gradient(135deg, #ffffff, #fcf7eb); }
+      body.staff-agenda-mode .availability-card-header p { color: #675d4f; }
+      body.staff-agenda-mode .availability-step { border-color: #e8dfce; background: #fffaf0; }
+      body.staff-agenda-mode .availability-step-title { color: #4e463a; }
+      body.staff-agenda-mode .availability-step-title strong { background: #d8c38e; color: #51452c; }
+      body.staff-agenda-mode .agenda-field { color: #51493d; }
+      body.staff-agenda-mode .agenda-field input,
+      body.staff-agenda-mode .agenda-field select,
+      body.staff-agenda-mode .agenda-field textarea { border-color: #d7c89e; background: #ffffff; color: #2e2922; }
+      body.staff-agenda-mode .agenda-field input:focus,
+      body.staff-agenda-mode .agenda-field select:focus,
+      body.staff-agenda-mode .agenda-field textarea:focus { border-color: #b99862; box-shadow: 0 0 0 3px rgba(185, 152, 98, .16); }
+      body.staff-agenda-mode .weekday-choice span { border-color: #d7c89e; background: #ffffff; color: #675d4f; }
+      body.staff-agenda-mode .weekday-choice input:checked + span { border-color: #c5a55c; background: #e9ddb9; color: #4a3f2a; }
+      body.staff-agenda-mode .weekday-choice input:focus-visible + span { outline-color: rgba(185, 152, 98, .24); }
+      body.staff-agenda-mode .availability-preview { border-left-color: #c5a55c; background: #fbf7ed; color: #675d4f; }
+      body.staff-agenda-mode .availability-list-heading h4 { color: #3f382e; }
+      body.staff-agenda-mode .availability-count { background: #f2e8cf; color: #7b6336; }
+      body.staff-agenda-mode .staff-availability-calendar { border-color: #e4ddcf; background: #fffaf2; }
+      body.staff-agenda-mode .calendar-header strong { color: #463c2e; }
+      body.staff-agenda-mode .calendar-nav { border-color: #d7c89e; background: #ffffff; color: #7b6336; }
+      body.staff-agenda-mode .staff-calendar-week { color: #a98752; }
+      body.staff-agenda-mode .staff-calendar-day { color: #a09788; }
+      body.staff-agenda-mode .staff-calendar-day.is-open { border-color: #c8aa70; background: #f2e7ca; color: #55462c; }
+      body.staff-agenda-mode .staff-calendar-day.is-open::after { background: #b99862; }
+      body.staff-agenda-mode .staff-calendar-day.is-open:hover { border-color: #aa8a4c; background: #eadab3; }
+      body.staff-agenda-mode .staff-calendar-day.is-open:focus-visible { outline-color: rgba(185, 152, 98, .28); }
+      body.staff-agenda-mode .staff-calendar-help { color: #756d61; }
+      body.staff-agenda-mode .appointment-item,
+      body.staff-agenda-mode .note-item { border-color: #ece4d5; background: #fffaf2; }
+      body.staff-agenda-mode .appointment-item strong,
+      body.staff-agenda-mode .note-item strong { color: #433a2e; }
+      body.staff-agenda-mode .appointment-item span,
+      body.staff-agenda-mode .note-item p { color: #756d61; }
+      body.staff-agenda-mode .status-pill { background: #f2e8cf; color: #795f30; }
+      body.staff-agenda-mode .appointment-action { border-color: #d7c89e; background: #ffffff; color: #685737; }
+      body.staff-agenda-mode .appointment-action:hover { background: #f5ecd7; }
+      body.staff-agenda-mode .appointment-action-danger { border-color: #d9a695; color: #a35647; }
+      body.staff-agenda-mode .appointment-action-danger:hover { background: #fbe9e3; }
+      body.staff-agenda-mode .agenda-feedback { color: #98773e; }
+      body.staff-agenda-mode .agenda-dashboard .btn-primary { background: #b79a62; color: #fffdf8; }
+      body.staff-agenda-mode .agenda-dashboard .btn-primary:hover { background: #a7874f; }
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
         *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
