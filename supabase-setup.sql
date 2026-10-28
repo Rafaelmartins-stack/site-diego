@@ -94,9 +94,15 @@ create table if not exists public.patient_profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   full_name text not null default '',
   email text not null default '',
+  phone text not null default '',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Mantém todos os pacientes atuais: o telefone começa vazio para eles.
+-- Execute este arquivo novamente no SQL Editor após atualizar o site.
+alter table public.patient_profiles
+add column if not exists phone text not null default '';
 
 create table if not exists public.appointments (
   id uuid primary key default gen_random_uuid(),
@@ -146,14 +152,19 @@ begin
     return new;
   end if;
 
-  insert into public.patient_profiles (id, full_name, email)
+  insert into public.patient_profiles (id, full_name, email, phone)
   values (
     new.id,
     coalesce(nullif(trim(new.raw_user_meta_data ->> 'full_name'), ''), split_part(coalesce(new.email, ''), '@', 1), 'Paciente'),
-    coalesce(new.email, '')
+    coalesce(new.email, ''),
+    coalesce(new.raw_user_meta_data ->> 'phone', '')
   )
   on conflict (id) do update
   set email = excluded.email,
+      phone = case
+        when coalesce(patient_profiles.phone, '') = '' then excluded.phone
+        else patient_profiles.phone
+      end,
       updated_at = now();
   return new;
 end;

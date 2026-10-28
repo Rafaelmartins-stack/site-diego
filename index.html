@@ -192,6 +192,7 @@
       .agenda-field textarea { min-height: 88px; resize: vertical; }
       .agenda-field input:focus, .agenda-field select:focus, .agenda-field textarea:focus { border-color: #d7bd78; box-shadow: 0 0 0 3px rgba(215,189,120,.14); }
       .agenda-feedback, .portal-feedback { min-height: 20px; margin: 4px 0 0; color: #d7bd78; font-size: .82rem; line-height: 1.45; }
+      .staff-message-help { margin: -5px 0 3px; color: #d8c8a9; font-size: .8rem; line-height: 1.48; }
       .appointment-list, .note-list { display: grid; gap: 10px; max-height: 540px; overflow: auto; }
       .appointment-item, .note-item { padding: 14px; border: 1px solid rgba(215, 189, 120, .24); border-radius: 12px; background: rgba(0, 0, 0, .14); }
       .appointment-item strong, .note-item strong { display: block; margin-bottom: 4px; color: #fffaf0; font-size: .92rem; }
@@ -251,6 +252,7 @@
       body.portal-light-theme .portal-heading p,
       body.portal-light-theme .sync-status,
       body.portal-light-theme .staff-calendar-help,
+      body.portal-light-theme .staff-message-help,
       body.portal-light-theme .time-slot-help,
       body.portal-light-theme .time-slot-empty,
       body.portal-light-theme .portal-empty { color: #675d4f; }
@@ -623,10 +625,11 @@
           <p>Com uma conta você acompanha as orientações da consulta e solicita novos horários. Ao concluir o cadastro, seu portal abre automaticamente.</p>
           <label>Seu nome completo<input id="patient-name-input" type="text" autocomplete="name" required placeholder="Nome e sobrenome" /></label>
           <label>Seu e-mail<input id="patient-signup-email" type="email" autocomplete="email" required placeholder="voce@exemplo.com" /></label>
+          <label>Seu WhatsApp<input id="patient-signup-phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="(11) 99999-9999" /></label>
           <label>Crie uma senha<input id="patient-signup-password" type="password" autocomplete="new-password" minlength="6" required placeholder="Mínimo de 6 caracteres" /></label>
           <button class="btn btn-primary" type="submit">Criar minha conta</button>
           <p class="access-feedback" id="patient-signup-feedback" aria-live="polite"></p>
-          <p class="access-disclaimer">Seu acesso será aberto assim que o cadastro for concluído.</p>
+          <p class="access-disclaimer">Seu WhatsApp será usado apenas para os avisos do seu acompanhamento. Seu acesso será aberto assim que o cadastro for concluído.</p>
         </form>
       </div>
     </section>
@@ -739,6 +742,16 @@
               <label class="agenda-field">Plano alimentar<textarea id="staff-note-diet" placeholder="Orientações de alimentação e hábitos"></textarea></label>
               <button class="btn btn-primary" type="submit">Salvar orientações</button>
               <p class="agenda-feedback" id="staff-note-feedback" aria-live="polite"></p>
+            </form>
+          </div>
+          <div class="agenda-card" id="staff-message-card">
+            <h3>Mensagem por WhatsApp</h3>
+            <p class="staff-message-help">Escolha o cliente, revise ou altere a mensagem e abra a conversa já pronta para enviar. As orientações completas continuam protegidas no portal.</p>
+            <form class="agenda-form" id="staff-whatsapp-form">
+              <label class="agenda-field">Cliente<select id="staff-whatsapp-patient" required><option value="">Carregando clientes…</option></select></label>
+              <label class="agenda-field">Mensagem<textarea id="staff-whatsapp-message" required placeholder="A mensagem para o cliente aparecerá aqui."></textarea></label>
+              <button class="btn btn-primary" type="submit">Abrir conversa no WhatsApp</button>
+              <p class="agenda-feedback" id="staff-whatsapp-feedback" aria-live="polite"></p>
             </form>
           </div>
           <div class="agenda-card" style="grid-column: 1 / -1;">
@@ -1078,6 +1091,7 @@
       let patientRefreshDebounceTimer = 0;
       let staffCalendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
       let clinicContentRefreshTimer = 0;
+      let patientPhoneColumnAvailable = true;
 
       function readLocalObject(key) {
         try {
@@ -1188,6 +1202,11 @@
         if (phone.length === 11) return `(${phone.slice(0, 2)}) ${phone.slice(2, 7)}-${phone.slice(7)}`;
         if (phone.length === 10) return `(${phone.slice(0, 2)}) ${phone.slice(2, 6)}-${phone.slice(6)}`;
         return value || '';
+      }
+
+      function normalizePatientPhone(value) {
+        const phone = normalizePhone(value);
+        return /^55\d{10,11}$/.test(phone) ? phone : '';
       }
 
       function appointmentUrl(message) {
@@ -1688,8 +1707,61 @@
         return profile || {};
       }
 
+      function hasUnavailablePatientPhoneColumn(error) {
+        const message = String(error?.message || '').toLowerCase();
+        return patientPhoneColumnAvailable && (
+          error?.code === '42703'
+          || error?.code === 'PGRST204'
+          || (message.includes('phone') && (message.includes('column') || message.includes('schema cache')))
+        );
+      }
+
+      function patientProfileFields() {
+        return patientPhoneColumnAvailable ? 'id, full_name, email, phone' : 'id, full_name, email';
+      }
+
+      function appointmentProfileFields() {
+        return patientPhoneColumnAvailable ? 'full_name, email, phone' : 'full_name, email';
+      }
+
+      function staffPatientById(patientId) {
+        return staffPatients.find((patient) => patient.id === patientId) || null;
+      }
+
+      function patientFirstName(patient) {
+        const name = String(patient?.full_name || patient?.email || 'paciente').trim();
+        return name.split(/\s+/)[0] || 'paciente';
+      }
+
+      function staffWhatsAppMessage(patient, type = 'general', details = {}) {
+        const greeting = 'Olá, ' + patientFirstName(patient) + '! Aqui é da equipe do Dr. Diego Iamato. ';
+        const date = details.scheduledAt ? formatAppointmentDate(details.scheduledAt) : '';
+        if (type === 'request') return greeting + (date ? 'Recebemos sua solicitação para ' + date + '. Em breve retornaremos para confirmar.' : 'Recebemos sua solicitação de consulta. Em breve retornaremos para confirmar.');
+        if (type === 'confirmed') return greeting + (date ? 'Sua consulta para ' + date + ' está confirmada.' : 'Sua consulta está confirmada.');
+        if (type === 'cancelled') return greeting + (date ? 'Sua consulta prevista para ' + date + ' foi cancelada. Vamos ajudar você a remarcar.' : 'Sua consulta foi cancelada. Vamos ajudar você a remarcar.');
+        if (type === 'appointment') return greeting + (date ? 'Registramos uma consulta para ' + date + '. Confira os detalhes no seu portal.' : 'Registramos uma consulta para você. Confira os detalhes no seu portal.');
+        if (type === 'notes') return greeting + 'Suas orientações foram atualizadas no portal. Quando puder, confira por lá.';
+        return greeting + 'Gostaríamos de falar brevemente sobre o seu acompanhamento.';
+      }
+
+      function prepareStaffWhatsAppMessage(patientId, type = 'general', details = {}, reveal = false) {
+        const patient = staffPatientById(patientId);
+        const select = document.getElementById('staff-whatsapp-patient');
+        const messageField = document.getElementById('staff-whatsapp-message');
+        const feedbackElement = document.getElementById('staff-whatsapp-feedback');
+        if (!patient || !select || !messageField || !feedbackElement) return false;
+        select.value = patient.id;
+        messageField.value = staffWhatsAppMessage(patient, type, details);
+        const phone = normalizePatientPhone(patient.phone);
+        feedbackElement.textContent = phone
+          ? 'Mensagem pronta para revisão antes de abrir o WhatsApp.'
+          : 'Este cliente ainda não informou WhatsApp. O acesso ao portal dele continua normal.';
+        if (reveal) document.getElementById('staff-message-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return Boolean(phone);
+      }
+
       function populateStaffPatientSelects() {
-        ['staff-appointment-patient', 'staff-note-patient'].forEach((id) => {
+        ['staff-appointment-patient', 'staff-note-patient', 'staff-whatsapp-patient'].forEach((id) => {
           const select = document.getElementById(id);
           if (!select) return;
           const selected = select.value;
@@ -1720,8 +1792,9 @@
           const cancelAction = appointment.status !== 'cancelled' && appointment.status !== 'completed'
             ? '<button class="appointment-action appointment-action-danger" type="button" data-cancel-appointment="' + appointment.id + '">Cancelar consulta</button>'
             : '';
+          const whatsappAction = '<button class="appointment-action" type="button" data-prepare-whatsapp="' + appointment.id + '">Mensagem WhatsApp</button>';
           const duration = appointment.duration_minutes ? ' · ' + formatDuration(Number(appointment.duration_minutes)) : '';
-          return '<article class="appointment-item"><strong>' + patientName + '</strong><span>' + formatAppointmentDate(appointment.scheduled_at) + duration + '</span>' + message + '<div class="appointment-meta"><span class="status-pill">' + statusLabel(appointment.status) + '</span><div class="appointment-actions">' + confirmAction + cancelAction + '</div></div></article>';
+          return '<article class="appointment-item"><strong>' + patientName + '</strong><span>' + formatAppointmentDate(appointment.scheduled_at) + duration + '</span>' + message + '<div class="appointment-meta"><span class="status-pill">' + statusLabel(appointment.status) + '</span><div class="appointment-actions">' + whatsappAction + confirmAction + cancelAction + '</div></div></article>';
         }).join('');
       }
 
@@ -1764,10 +1837,14 @@
           return;
         }
         const [profilesResult, appointmentsResult, availabilityResult] = await Promise.all([
-          supabaseClient.from('patient_profiles').select('id, full_name, email').order('full_name', { ascending: true }),
-          supabaseClient.from('appointments').select('id, patient_id, scheduled_at, duration_minutes, status, patient_message, patient_profiles(full_name, email)').order('scheduled_at', { ascending: true }).limit(60),
+          supabaseClient.from('patient_profiles').select(patientProfileFields()).order('full_name', { ascending: true }),
+          supabaseClient.from('appointments').select('id, patient_id, scheduled_at, duration_minutes, status, patient_message, patient_profiles(' + appointmentProfileFields() + ')').order('scheduled_at', { ascending: true }).limit(60),
           supabaseClient.from('appointment_availability').select('id, available_date, start_time, end_time, slot_minutes').gte('available_date', toLocalDateISO(new Date())).order('available_date', { ascending: true }).limit(365)
         ]);
+        if (hasUnavailablePatientPhoneColumn(profilesResult.error || appointmentsResult.error)) {
+          patientPhoneColumnAvailable = false;
+          return loadStaffAgenda();
+        }
         if (profilesResult.error || appointmentsResult.error || availabilityResult.error) {
           const message = agendaSetupMessage(profilesResult.error || appointmentsResult.error || availabilityResult.error);
           if (list) list.innerHTML = '<p class="portal-empty">' + escapeHtml(message) + '</p>';
@@ -1786,11 +1863,17 @@
 
       async function ensurePatientProfile(user) {
         const fullName = String(user.user_metadata?.full_name || user.email?.split('@')[0] || 'Paciente').trim();
+        const profile = { id: user.id, full_name: fullName, email: user.email || '' };
+        if (patientPhoneColumnAvailable) profile.phone = normalizePatientPhone(user.user_metadata?.phone);
         const { data, error } = await supabaseClient
           .from('patient_profiles')
-          .upsert({ id: user.id, full_name: fullName, email: user.email || '' }, { onConflict: 'id' })
-          .select('id, full_name, email')
+          .upsert(profile, { onConflict: 'id' })
+          .select(patientProfileFields())
           .single();
+        if (hasUnavailablePatientPhoneColumn(error)) {
+          patientPhoneColumnAvailable = false;
+          return ensurePatientProfile(user);
+        }
         if (error) throw error;
         return data;
       }
@@ -1798,9 +1881,13 @@
       async function getPatientProfile(user) {
         const { data, error } = await supabaseClient
           .from('patient_profiles')
-          .select('id, full_name, email')
+          .select(patientProfileFields())
           .eq('id', user.id)
           .maybeSingle();
+        if (hasUnavailablePatientPhoneColumn(error)) {
+          patientPhoneColumnAvailable = false;
+          return getPatientProfile(user);
+        }
         if (error) throw error;
         return data || ensurePatientProfile(user);
       }
@@ -2180,11 +2267,22 @@
           patientSignupFeedback.textContent = 'Não foi possível conectar ao serviço de acesso. Atualize a página e tente novamente.';
           return;
         }
+        const patientPhone = normalizePatientPhone(document.getElementById('patient-signup-phone').value);
+        if (!patientPhone) {
+          patientSignupFeedback.textContent = 'Digite um WhatsApp válido com DDD. Exemplo: (11) 99999-9999.';
+          document.getElementById('patient-signup-phone').focus();
+          return;
+        }
         patientSignupFeedback.textContent = 'Criando sua conta…';
         const { data, error } = await supabaseClient.auth.signUp({
           email: document.getElementById('patient-signup-email').value.trim(),
           password: document.getElementById('patient-signup-password').value,
-          options: { data: { full_name: document.getElementById('patient-name-input').value.trim() } }
+          options: {
+            data: {
+              full_name: document.getElementById('patient-name-input').value.trim(),
+              phone: patientPhone
+            }
+          }
         });
         if (error) {
           patientSignupFeedback.textContent = error.message || 'Não foi possível criar a conta. Tente novamente.';
@@ -2359,13 +2457,14 @@
           feedbackElement.textContent = 'Atualize a data e escolha um horário liberado.';
           return;
         }
+        const appointmentStatus = document.getElementById('staff-appointment-status').value;
         const { data: { user } } = await supabaseClient.auth.getUser();
         feedbackElement.textContent = 'Salvando consulta…';
         const { error } = await supabaseClient.from('appointments').insert({
           patient_id: patientId,
           scheduled_at: appointmentIso(date, time),
           duration_minutes: Number(selectedSlot.duration_minutes),
-          status: document.getElementById('staff-appointment-status').value,
+          status: appointmentStatus,
           created_by: user?.id || null
         });
         if (error) {
@@ -2374,7 +2473,12 @@
             : agendaSetupMessage(error);
           return;
         }
-        feedbackElement.textContent = 'Consulta salva e visível no portal do cliente.';
+        const whatsappReady = prepareStaffWhatsAppMessage(
+          patientId,
+          appointmentStatus === 'confirmed' ? 'confirmed' : 'appointment',
+          { scheduledAt: appointmentIso(date, time) }
+        );
+        feedbackElement.textContent = 'Consulta salva e visível no portal do cliente.' + (whatsappReady ? ' A mensagem do WhatsApp ficou pronta para revisão.' : ' O cliente ainda não informou WhatsApp.');
         document.getElementById('staff-appointment-time').value = '';
         await loadStaffAgenda();
       });
@@ -2399,10 +2503,41 @@
           feedbackElement.textContent = agendaSetupMessage(error);
           return;
         }
-        feedbackElement.textContent = 'Orientações salvas no portal do cliente.';
+        const whatsappReady = prepareStaffWhatsAppMessage(patientId, 'notes');
+        feedbackElement.textContent = 'Orientações salvas no portal do cliente.' + (whatsappReady ? ' A mensagem do WhatsApp ficou pronta para revisão.' : ' O cliente ainda não informou WhatsApp.');
         document.getElementById('staff-note-summary').value = '';
         document.getElementById('staff-note-training').value = '';
         document.getElementById('staff-note-diet').value = '';
+      });
+      document.getElementById('staff-whatsapp-patient').addEventListener('change', (event) => {
+        const feedbackElement = document.getElementById('staff-whatsapp-feedback');
+        if (!event.target.value) {
+          document.getElementById('staff-whatsapp-message').value = '';
+          feedbackElement.textContent = '';
+          return;
+        }
+        prepareStaffWhatsAppMessage(event.target.value);
+      });
+      document.getElementById('staff-whatsapp-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const patient = staffPatientById(document.getElementById('staff-whatsapp-patient').value);
+        const message = document.getElementById('staff-whatsapp-message').value.trim();
+        const feedbackElement = document.getElementById('staff-whatsapp-feedback');
+        const phone = normalizePatientPhone(patient?.phone);
+        if (!patient) {
+          feedbackElement.textContent = 'Escolha um cliente antes de abrir o WhatsApp.';
+          return;
+        }
+        if (!phone) {
+          feedbackElement.textContent = 'Este cliente ainda não informou WhatsApp. O acesso ao portal dele continua normal.';
+          return;
+        }
+        if (!message) {
+          feedbackElement.textContent = 'Escreva uma mensagem breve antes de abrir o WhatsApp.';
+          return;
+        }
+        window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
+        feedbackElement.textContent = 'Conversa aberta com a mensagem pronta. Revise e envie pelo WhatsApp.';
       });
       document.getElementById('staff-availability-calendar').addEventListener('click', async (event) => {
         const button = event.target.closest('[data-close-availability]');
@@ -2423,23 +2558,43 @@
         await loadStaffAgenda();
       });
       document.getElementById('staff-appointments-list').addEventListener('click', async (event) => {
-        const button = event.target.closest('[data-confirm-appointment], [data-cancel-appointment]');
+        const button = event.target.closest('[data-prepare-whatsapp], [data-confirm-appointment], [data-cancel-appointment]');
         if (!button) return;
+        if (button.dataset.prepareWhatsapp) {
+          const appointment = staffAppointments.find((item) => item.id === button.dataset.prepareWhatsapp);
+          if (!appointment) return;
+          const type = appointment.status === 'requested'
+            ? 'request'
+            : appointment.status === 'cancelled'
+              ? 'cancelled'
+              : appointment.status === 'confirmed'
+                ? 'confirmed'
+                : 'appointment';
+          prepareStaffWhatsAppMessage(appointment.patient_id, type, { scheduledAt: appointment.scheduled_at }, true);
+          return;
+        }
         const cancelling = Boolean(button.dataset.cancelAppointment);
         if (cancelling && !window.confirm('Cancelar esta consulta? O horário ficará disponível novamente para agendamento.')) return;
+        const appointmentId = cancelling ? button.dataset.cancelAppointment : button.dataset.confirmAppointment;
+        const appointment = staffAppointments.find((item) => item.id === appointmentId);
         button.disabled = true;
         const { error } = await supabaseClient
           .from('appointments')
           .update({ status: cancelling ? 'cancelled' : 'confirmed' })
-          .eq('id', cancelling ? button.dataset.cancelAppointment : button.dataset.confirmAppointment);
+          .eq('id', appointmentId);
         if (error) {
           document.getElementById('staff-appointment-feedback').textContent = agendaSetupMessage(error);
           button.disabled = false;
           return;
         }
+        const whatsappReady = appointment && prepareStaffWhatsAppMessage(
+          appointment.patient_id,
+          cancelling ? 'cancelled' : 'confirmed',
+          { scheduledAt: appointment.scheduled_at }
+        );
         document.getElementById('staff-appointment-feedback').textContent = cancelling
-          ? 'Consulta cancelada. O horário está disponível novamente.'
-          : 'Consulta confirmada e atualizada no portal do cliente.';
+          ? 'Consulta cancelada. O horário está disponível novamente.' + (whatsappReady ? ' A mensagem do WhatsApp ficou pronta para revisão.' : '')
+          : 'Consulta confirmada e atualizada no portal do cliente.' + (whatsappReady ? ' A mensagem do WhatsApp ficou pronta para revisão.' : '');
         await loadStaffAgenda();
       });
 
