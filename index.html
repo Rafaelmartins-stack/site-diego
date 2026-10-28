@@ -92,6 +92,13 @@
       .mode-switch:focus-visible { outline: 3px solid rgba(170, 138, 76, .35); outline-offset: 3px; }
       body:not(.access-gated) .mode-switch { display: inline-flex; }
       body.staff-mode .mode-switch { bottom: 72px; }
+      .theme-toggle { position: fixed; top: 18px; right: 18px; z-index: 21; display: none; align-items: center; gap: 8px; min-height: 42px; padding: 0 15px; border: 1px solid rgba(215, 189, 120, .46); border-radius: 999px; background: rgba(49, 43, 34, .94); box-shadow: 0 10px 25px rgba(23,21,18,.16); color: #fffaf0; cursor: pointer; font: inherit; font-size: .78rem; font-weight: 700; transition: transform .2s, background .2s, border-color .2s; }
+      .theme-toggle:hover { transform: translateY(-2px); border-color: #d7bd78; background: #3c3428; }
+      .theme-toggle:focus-visible { outline: 3px solid rgba(215, 189, 120, .34); outline-offset: 3px; }
+      .theme-toggle-icon { font-size: 1rem; line-height: 1; }
+      body.patient-mode .theme-toggle, body.staff-mode .theme-toggle { display: inline-flex; }
+      body.portal-light-theme .theme-toggle { border-color: #d7c89e; background: rgba(255, 253, 248, .96); box-shadow: 0 10px 25px rgba(23,21,18,.1); color: #5a4b31; }
+      body.portal-light-theme .theme-toggle:hover { border-color: #aa8a4c; background: #fff7e5; }
       /* Nos portais, a navegação fica concentrada na tarefa que a pessoa veio realizar. */
       body.patient-mode header,
       body.staff-agenda-mode header { display: none; }
@@ -232,55 +239,102 @@
       .portal-card .appointment-item, .portal-card .note-item { background: rgba(0, 0, 0, .18); }
       .portal-card .appointment-item span, .portal-card .note-item p { color: #eee4d2; }
       .portal-empty { margin: 0; color: #d8c8a9; font-size: .85rem; line-height: 1.5; }
-      /* Tema claro exclusivo para a agenda da equipe: branco, creme e dourado suave. */
-      body.staff-agenda-mode .agenda-dashboard { background: #fffdf8; color: var(--ink); }
-      body.staff-agenda-mode .agenda-dashboard .eyebrow { color: #aa8a4c; }
-      body.staff-agenda-mode .agenda-dashboard .intro-copy { color: #675d4f; }
-      body.staff-agenda-mode .sync-status { color: #756d61; }
-      body.staff-agenda-mode .sync-status::before { background: #c5a55c; box-shadow: 0 0 0 4px rgba(197, 165, 92, .13); }
-      body.staff-agenda-mode .agenda-card { border-color: #e4ddcf; background: #ffffff; box-shadow: 0 12px 30px rgba(23, 21, 18, .06); }
-      body.staff-agenda-mode .availability-card { border-color: rgba(170, 138, 76, .38); background: linear-gradient(135deg, #ffffff, #fcf7eb); }
-      body.staff-agenda-mode .availability-card-header p { color: #675d4f; }
-      body.staff-agenda-mode .availability-step { border-color: #e8dfce; background: #fffaf0; }
-      body.staff-agenda-mode .availability-step-title { color: #4e463a; }
-      body.staff-agenda-mode .availability-step-title strong { background: #d8c38e; color: #51452c; }
-      body.staff-agenda-mode .agenda-field { color: #51493d; }
-      body.staff-agenda-mode .agenda-field input,
-      body.staff-agenda-mode .agenda-field select,
-      body.staff-agenda-mode .agenda-field textarea { border-color: #d7c89e; background: #ffffff; color: #2e2922; }
-      body.staff-agenda-mode .agenda-field input:focus,
-      body.staff-agenda-mode .agenda-field select:focus,
-      body.staff-agenda-mode .agenda-field textarea:focus { border-color: #b99862; box-shadow: 0 0 0 3px rgba(185, 152, 98, .16); }
-      body.staff-agenda-mode .weekday-choice span { border-color: #d7c89e; background: #ffffff; color: #675d4f; }
-      body.staff-agenda-mode .weekday-choice input:checked + span { border-color: #c5a55c; background: #e9ddb9; color: #4a3f2a; }
-      body.staff-agenda-mode .weekday-choice input:focus-visible + span { outline-color: rgba(185, 152, 98, .24); }
-      body.staff-agenda-mode .availability-preview { border-left-color: #c5a55c; background: #fbf7ed; color: #675d4f; }
-      body.staff-agenda-mode .availability-list-heading h4 { color: #3f382e; }
-      body.staff-agenda-mode .availability-count { background: #f2e8cf; color: #7b6336; }
-      body.staff-agenda-mode .staff-availability-calendar { border-color: #e4ddcf; background: #fffaf2; }
-      body.staff-agenda-mode .calendar-header strong { color: #463c2e; }
-      body.staff-agenda-mode .calendar-nav { border-color: #d7c89e; background: #ffffff; color: #7b6336; }
-      body.staff-agenda-mode .staff-calendar-week { color: #a98752; }
-      body.staff-agenda-mode .staff-calendar-day { color: #a09788; }
-      body.staff-agenda-mode .staff-calendar-day.is-open { border-color: #c8aa70; background: #f2e7ca; color: #55462c; }
-      body.staff-agenda-mode .staff-calendar-day.is-open::after { background: #b99862; }
-      body.staff-agenda-mode .staff-calendar-day.is-open:hover { border-color: #aa8a4c; background: #eadab3; }
-      body.staff-agenda-mode .staff-calendar-day.is-open:focus-visible { outline-color: rgba(185, 152, 98, .28); }
-      body.staff-agenda-mode .staff-calendar-help { color: #756d61; }
-      body.staff-agenda-mode .appointment-item,
-      body.staff-agenda-mode .note-item { border-color: #ece4d5; background: #fffaf2; }
-      body.staff-agenda-mode .appointment-item strong,
-      body.staff-agenda-mode .note-item strong { color: #433a2e; }
-      body.staff-agenda-mode .appointment-item span,
-      body.staff-agenda-mode .note-item p { color: #756d61; }
-      body.staff-agenda-mode .status-pill { background: #f2e8cf; color: #795f30; }
-      body.staff-agenda-mode .appointment-action { border-color: #d7c89e; background: #ffffff; color: #685737; }
-      body.staff-agenda-mode .appointment-action:hover { background: #f5ecd7; }
-      body.staff-agenda-mode .appointment-action-danger { border-color: #d9a695; color: #a35647; }
-      body.staff-agenda-mode .appointment-action-danger:hover { background: #fbe9e3; }
-      body.staff-agenda-mode .agenda-feedback { color: #98773e; }
-      body.staff-agenda-mode .agenda-dashboard .btn-primary { background: #b79a62; color: #fffdf8; }
-      body.staff-agenda-mode .agenda-dashboard .btn-primary:hover { background: #a7874f; }
+      /* Tema claro compartilhado pelos portais; a escolha fica salva neste navegador. */
+      body.portal-light-theme .staff-dashboard,
+      body.portal-light-theme .agenda-dashboard,
+      body.portal-light-theme .patient-portal { background: #fffdf8; color: var(--ink); }
+      body.portal-light-theme .staff-dashboard .eyebrow,
+      body.portal-light-theme .agenda-dashboard .eyebrow,
+      body.portal-light-theme .portal-heading .eyebrow { color: #aa8a4c; }
+      body.portal-light-theme .staff-dashboard .intro-copy,
+      body.portal-light-theme .agenda-dashboard .intro-copy,
+      body.portal-light-theme .portal-heading p,
+      body.portal-light-theme .sync-status,
+      body.portal-light-theme .staff-calendar-help,
+      body.portal-light-theme .time-slot-help,
+      body.portal-light-theme .time-slot-empty,
+      body.portal-light-theme .portal-empty { color: #675d4f; }
+      body.portal-light-theme .sync-status::before { background: #c5a55c; box-shadow: 0 0 0 4px rgba(197, 165, 92, .13); }
+      body.portal-light-theme .agenda-card,
+      body.portal-light-theme .portal-card { border-color: #e4ddcf; background: #ffffff; box-shadow: 0 12px 30px rgba(23, 21, 18, .06); }
+      body.portal-light-theme .staff-field,
+      body.portal-light-theme .agenda-field,
+      body.portal-light-theme .portal-form label,
+      body.portal-light-theme .time-slot-label,
+      body.portal-light-theme .availability-step-title { color: #51493d; }
+      body.portal-light-theme .staff-field input,
+      body.portal-light-theme .staff-field textarea,
+      body.portal-light-theme .agenda-field input,
+      body.portal-light-theme .agenda-field select,
+      body.portal-light-theme .agenda-field textarea,
+      body.portal-light-theme .portal-form select,
+      body.portal-light-theme .portal-form textarea { border-color: #d7c89e; background: #ffffff; color: #2e2922; }
+      body.portal-light-theme .staff-field input:focus,
+      body.portal-light-theme .staff-field textarea:focus,
+      body.portal-light-theme .agenda-field input:focus,
+      body.portal-light-theme .agenda-field select:focus,
+      body.portal-light-theme .agenda-field textarea:focus,
+      body.portal-light-theme .portal-form select:focus,
+      body.portal-light-theme .portal-form textarea:focus { border-color: #b99862; box-shadow: 0 0 0 3px rgba(185, 152, 98, .16); }
+      body.portal-light-theme .inline-editor-hint { border-color: #d7c89e; background: #fffaf0; color: #675d4f; }
+      body.portal-light-theme .inline-editor-hint strong,
+      body.portal-light-theme .photo-editor-heading,
+      body.portal-light-theme .photo-editor label { color: #433a2e; }
+      body.portal-light-theme .photo-editor { border-color: #d7c89e; }
+      body.portal-light-theme .photo-editor input,
+      body.portal-light-theme .photo-editor small { color: #756d61; }
+      body.portal-light-theme .availability-card { border-color: rgba(170, 138, 76, .38); background: linear-gradient(135deg, #ffffff, #fcf7eb); }
+      body.portal-light-theme .availability-card-header p { color: #675d4f; }
+      body.portal-light-theme .availability-step { border-color: #e8dfce; background: #fffaf0; }
+      body.portal-light-theme .availability-step-title strong { background: #d8c38e; color: #51452c; }
+      body.portal-light-theme .weekday-choice span { border-color: #d7c89e; background: #ffffff; color: #675d4f; }
+      body.portal-light-theme .weekday-choice input:checked + span { border-color: #c5a55c; background: #e9ddb9; color: #4a3f2a; }
+      body.portal-light-theme .weekday-choice input:focus-visible + span { outline-color: rgba(185, 152, 98, .24); }
+      body.portal-light-theme .availability-preview { border-left-color: #c5a55c; background: #fbf7ed; color: #675d4f; }
+      body.portal-light-theme .availability-list-heading h4 { color: #3f382e; }
+      body.portal-light-theme .availability-count,
+      body.portal-light-theme .status-pill { background: #f2e8cf; color: #795f30; }
+      body.portal-light-theme .staff-availability-calendar { border-color: #e4ddcf; background: #fffaf2; }
+      body.portal-light-theme .calendar-header strong { color: #463c2e; }
+      body.portal-light-theme .calendar-nav { border-color: #d7c89e; background: #ffffff; color: #7b6336; }
+      body.portal-light-theme .staff-calendar-week,
+      body.portal-light-theme .calendar-week { color: #a98752; }
+      body.portal-light-theme .staff-calendar-day,
+      body.portal-light-theme .calendar-day { color: #8b8171; }
+      body.portal-light-theme .staff-calendar-day.is-open,
+      body.portal-light-theme .calendar-day:not(:disabled):hover,
+      body.portal-light-theme .calendar-day.is-selected { border-color: #c8aa70; background: #f2e7ca; color: #55462c; }
+      body.portal-light-theme .staff-calendar-day.is-open::after,
+      body.portal-light-theme .calendar-day.is-available::after { background: #b99862; }
+      body.portal-light-theme .staff-calendar-day.is-open:hover { border-color: #aa8a4c; background: #eadab3; }
+      body.portal-light-theme .appointment-item,
+      body.portal-light-theme .note-item,
+      body.portal-light-theme .portal-card .appointment-item,
+      body.portal-light-theme .portal-card .note-item,
+      body.portal-light-theme .time-slot { border-color: #ece4d5; background: #fffaf2; color: #433a2e; }
+      body.portal-light-theme .appointment-item strong,
+      body.portal-light-theme .note-item strong { color: #433a2e; }
+      body.portal-light-theme .appointment-item span,
+      body.portal-light-theme .note-item p,
+      body.portal-light-theme .portal-card .appointment-item span,
+      body.portal-light-theme .portal-card .note-item p { color: #756d61; }
+      body.portal-light-theme .time-slot:hover { border-color: #b99862; background: #f5ecd7; }
+      body.portal-light-theme .time-slot.is-selected { border-color: #b99862; background: #d8c38e; color: #4a3f2a; box-shadow: 0 6px 16px rgba(91, 71, 37, .12); }
+      body.portal-light-theme .appointment-action { border-color: #d7c89e; background: #ffffff; color: #685737; }
+      body.portal-light-theme .appointment-action:hover { background: #f5ecd7; }
+      body.portal-light-theme .appointment-action-danger { border-color: #d9a695; color: #a35647; }
+      body.portal-light-theme .appointment-action-danger:hover { background: #fbe9e3; }
+      body.portal-light-theme .agenda-feedback,
+      body.portal-light-theme .portal-feedback,
+      body.portal-light-theme .editor-feedback { color: #98773e; }
+      body.portal-light-theme .staff-dashboard .btn-primary,
+      body.portal-light-theme .agenda-dashboard .btn-primary,
+      body.portal-light-theme .patient-portal .btn-primary { background: #b79a62; color: #fffdf8; }
+      body.portal-light-theme .staff-dashboard .btn-primary:hover,
+      body.portal-light-theme .agenda-dashboard .btn-primary:hover,
+      body.portal-light-theme .patient-portal .btn-primary:hover { background: #a7874f; }
+      body.portal-light-theme .patient-portal .btn-outline { border-color: #b79a62; color: #685737; }
+      body.portal-light-theme .patient-portal .btn-outline:hover { background: #f5ecd7; }
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
         *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -489,6 +543,7 @@
         .availability-actions .btn { width: 100%; }
         .portal-heading { align-items: flex-start; flex-direction: column; }
         .mode-switch { right: 13px; bottom: 13px; min-height: 42px; padding: 0 14px; font-size: .75rem; }
+        .theme-toggle { top: 13px; right: 13px; min-height: 40px; padding: 0 13px; font-size: .74rem; }
         body.staff-mode .mode-switch { bottom: 67px; }
         .person { max-width: 360px; }
         .map-wrap { height: 330px; }
@@ -944,6 +999,7 @@
 
     <div class="staff-status" id="staff-status" aria-live="polite">Modo funcionário ativo <button id="logout-button" type="button">Sair</button></div>
     <button class="mode-switch" id="mode-switch" type="button" aria-label="Trocar entre cliente e funcionário">Trocar acesso</button>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="Ativar modo claro"><span class="theme-toggle-icon" id="theme-toggle-icon" aria-hidden="true">☼</span><span id="theme-toggle-label">Modo claro</span></button>
     <input class="inline-image-input" id="inline-image-input" type="file" accept="image/png,image/jpeg,image/webp" />
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -965,6 +1021,9 @@
       const patientCalendarTitle = document.getElementById('patient-calendar-title');
       const patientSelectedDate = document.getElementById('patient-selected-date');
       const patientAppointmentFeedback = document.getElementById('patient-appointment-feedback');
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeToggleIcon = document.getElementById('theme-toggle-icon');
+      const themeToggleLabel = document.getElementById('theme-toggle-label');
       const supabaseUrl = 'https://mxuzetneqbcdgybwfqwj.supabase.co';
       const supabasePublishableKey = 'sb_publishable_WdsXtYNvFvs-aqySTHFKTA_FFRPw9jq';
       const supabaseClient = window.supabase?.createClient
@@ -987,6 +1046,8 @@
       const inlineImageInput = document.getElementById('inline-image-input');
       const localSiteImagesKey = 'diego-iamoto-site-images-v1';
       const localEditableTextKey = 'diego-iamato-inline-text-v1';
+      const localClinicContactKey = 'diego-iamato-clinic-contact-v1';
+      const portalThemeStorageKey = 'diego-iamato-portal-theme-v1';
       const siteImageDefaults = {
         clinic: 'assets/dr-diego.png',
         consultation: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=85',
@@ -1016,6 +1077,7 @@
       let staffRefreshDebounceTimer = 0;
       let patientRefreshDebounceTimer = 0;
       let staffCalendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      let clinicContentRefreshTimer = 0;
 
       function readLocalObject(key) {
         try {
@@ -1033,6 +1095,64 @@
         } catch (error) {
           return false;
         }
+      }
+
+      function getSavedPortalTheme() {
+        try {
+          const savedTheme = localStorage.getItem(portalThemeStorageKey);
+          return savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : '';
+        } catch (error) {
+          return '';
+        }
+      }
+
+      function applyPortalTheme(theme) {
+        const activeTheme = theme === 'light' ? 'light' : 'dark';
+        const isLight = activeTheme === 'light';
+        document.body.classList.toggle('portal-light-theme', isLight);
+        themeToggle.setAttribute('aria-pressed', String(isLight));
+        themeToggleIcon.textContent = isLight ? '☾' : '☼';
+        themeToggleLabel.textContent = isLight ? 'Modo escuro' : 'Modo claro';
+        themeToggle.setAttribute('aria-label', isLight ? 'Ativar modo escuro' : 'Ativar modo claro');
+      }
+
+      function applySavedPortalTheme() {
+        const defaultTheme = document.body.classList.contains('staff-agenda-mode') ? 'light' : 'dark';
+        applyPortalTheme(getSavedPortalTheme() || defaultTheme);
+      }
+
+      function setSavedPortalTheme(theme) {
+        try {
+          localStorage.setItem(portalThemeStorageKey, theme);
+        } catch (error) {
+          // A troca ainda funciona nesta sessão quando o navegador bloqueia armazenamento local.
+        }
+      }
+
+      function isValidClinicContactSnapshot(content) {
+        return Boolean(content && typeof content.address === 'string' && content.address.trim());
+      }
+
+      function cacheClinicContact(content) {
+        if (!isValidClinicContactSnapshot(content)) return;
+        writeLocalObject(localClinicContactKey, {
+          address: content.address.trim(),
+          instagram: typeof content.instagram === 'string' ? content.instagram : '',
+          phone: typeof content.phone === 'string' ? content.phone : '',
+          updatedAt: content.updatedAt || ''
+        });
+      }
+
+      function applyCachedClinicContact(content) {
+        if (!isValidClinicContactSnapshot(content)) return;
+        clinicContent = normalizeClinicContent({
+          ...clinicContent,
+          address: content.address.trim(),
+          instagram: typeof content.instagram === 'string' && content.instagram ? content.instagram : clinicContent.instagram,
+          phone: typeof content.phone === 'string' && content.phone ? content.phone : clinicContent.phone,
+          updatedAt: content.updatedAt || clinicContent.updatedAt
+        });
+        applyClinicContent(clinicContent);
       }
 
       function loadSiteImages() {
@@ -1167,7 +1287,8 @@
           appointmentMessage: record.appointment_message,
           phone: record.phone,
           pageContent: record.page_content,
-          siteImages: record.site_images
+          siteImages: record.site_images,
+          updatedAt: record.updated_at || ''
         });
       }
 
@@ -1194,6 +1315,16 @@
       }
 
       let clinicContent = { ...defaultClinicContent };
+
+      function applyRemoteClinicContent(record) {
+        const incomingContent = recordToClinicContent(record);
+        if (!isCurrentBrandContent(incomingContent)) return false;
+        clinicContent = incomingContent;
+        applyClinicContent(clinicContent);
+        applyPresentationFromClinicContent(clinicContent);
+        cacheClinicContact(clinicContent);
+        return true;
+      }
 
       function getInlineTextElements() {
         const selector = [
@@ -1323,14 +1454,7 @@
           console.error('Erro ao buscar o conteúdo da clínica:', error);
           return;
         }
-        if (data) {
-          const incomingContent = recordToClinicContent(data);
-          if (isCurrentBrandContent(incomingContent)) {
-            clinicContent = incomingContent;
-            applyClinicContent(clinicContent);
-            applyPresentationFromClinicContent(clinicContent);
-          }
-        }
+        if (data) applyRemoteClinicContent(data);
       }
 
       function subscribeToClinicContent() {
@@ -1343,14 +1467,8 @@
             table: 'clinic_content',
             filter: 'id=eq.1'
           }, (payload) => {
-            const incomingContent = recordToClinicContent(payload.new);
-            if (isCurrentBrandContent(incomingContent)) {
-              clinicContent = incomingContent;
-              applyClinicContent(clinicContent);
-              applyPresentationFromClinicContent(clinicContent);
-              if (document.body.classList.contains('staff-mode')) {
-                editorFeedback.textContent = 'Conteúdo atualizado em tempo real.';
-              }
+            if (applyRemoteClinicContent(payload.new) && document.body.classList.contains('staff-mode')) {
+              editorFeedback.textContent = 'Conteúdo atualizado em tempo real.';
             }
           })
           .subscribe((status, error) => {
@@ -1358,6 +1476,11 @@
               console.error('A sincronização em tempo real não foi iniciada:', error);
             }
           });
+      }
+
+      function startClinicContentAutoRefresh() {
+        window.clearInterval(clinicContentRefreshTimer);
+        clinicContentRefreshTimer = window.setInterval(loadClinicContentFromSupabase, 30000);
       }
 
       function contentReadyForSync() {
@@ -1391,9 +1514,7 @@
           editorFeedback.textContent = 'Não foi possível salvar. Confira sua conexão e tente novamente.';
           return false;
         }
-        clinicContent = recordToClinicContent(data);
-        applyClinicContent(clinicContent);
-        applyPresentationFromClinicContent(clinicContent);
+        applyRemoteClinicContent(data);
         editorFeedback.textContent = 'Alterações salvas e sincronizadas em todos os aparelhos.';
         if (remoteSyncQueued) {
           remoteSyncQueued = false;
@@ -1869,10 +1990,31 @@
 
       loadClinicContentFromSupabase();
       subscribeToClinicContent();
+      startClinicContentAutoRefresh();
+
+      themeToggle.addEventListener('click', () => {
+        const nextTheme = document.body.classList.contains('portal-light-theme') ? 'dark' : 'light';
+        applyPortalTheme(nextTheme);
+        setSavedPortalTheme(nextTheme);
+      });
+
+      window.addEventListener('storage', (event) => {
+        if (event.key === portalThemeStorageKey && (event.newValue === 'light' || event.newValue === 'dark')) {
+          applyPortalTheme(event.newValue);
+        }
+        if (event.key === localClinicContactKey && event.newValue) {
+          applyCachedClinicContact(readLocalObject(localClinicContactKey));
+        }
+      });
+
+      window.addEventListener('focus', loadClinicContentFromSupabase);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') loadClinicContentFromSupabase();
+      });
 
       function grantAccess(mode, workspace = '') {
         accessScreen.classList.add('is-hidden');
-        document.body.classList.remove('access-gated', 'staff-mode', 'staff-editor-mode', 'staff-agenda-mode', 'patient-mode');
+        document.body.classList.remove('access-gated', 'staff-mode', 'staff-editor-mode', 'staff-agenda-mode', 'patient-mode', 'portal-light-theme');
         if (mode === 'staff') {
           document.body.classList.add('staff-mode', workspace === 'agenda' ? 'staff-agenda-mode' : 'staff-editor-mode');
           setInlineEditing(workspace !== 'agenda');
@@ -1888,6 +2030,7 @@
         } else {
           setInlineEditing(false);
         }
+        applySavedPortalTheme();
         setTimeout(() => {
           window.dispatchEvent(new Event('resize'));
         }, 50);
@@ -1935,7 +2078,7 @@
         await unsubscribePatientPortal();
         await unsubscribeStaffAgenda();
         if (supabaseClient) await supabaseClient.auth.signOut();
-        document.body.classList.remove('staff-mode', 'staff-editor-mode', 'staff-agenda-mode', 'patient-mode');
+        document.body.classList.remove('staff-mode', 'staff-editor-mode', 'staff-agenda-mode', 'patient-mode', 'portal-light-theme');
         setInlineEditing(false);
         document.body.classList.add('access-gated');
         accessScreen.classList.remove('is-hidden');
