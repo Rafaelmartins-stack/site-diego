@@ -746,9 +746,10 @@
           </div>
           <div class="agenda-card" id="staff-message-card">
             <h3>Mensagem por WhatsApp</h3>
-            <p class="staff-message-help">Escolha o cliente, revise ou altere a mensagem e abra a conversa já pronta para enviar. As orientações completas continuam protegidas no portal.</p>
+            <p class="staff-message-help">Escolha o cliente, confirme o WhatsApp e revise a mensagem antes de abrir a conversa. As orientações completas continuam protegidas no portal.</p>
             <form class="agenda-form" id="staff-whatsapp-form">
               <label class="agenda-field">Cliente<select id="staff-whatsapp-patient" required><option value="">Carregando clientes…</option></select></label>
+              <label class="agenda-field">WhatsApp do cliente<input id="staff-whatsapp-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required /></label>
               <label class="agenda-field">Mensagem<textarea id="staff-whatsapp-message" required placeholder="A mensagem para o cliente aparecerá aqui."></textarea></label>
               <button class="btn btn-primary" type="submit">Abrir conversa no WhatsApp</button>
               <p class="agenda-feedback" id="staff-whatsapp-feedback" aria-live="polite"></p>
@@ -1747,15 +1748,17 @@
       function prepareStaffWhatsAppMessage(patientId, type = 'general', details = {}, reveal = false) {
         const patient = staffPatientById(patientId);
         const select = document.getElementById('staff-whatsapp-patient');
+        const phoneField = document.getElementById('staff-whatsapp-phone');
         const messageField = document.getElementById('staff-whatsapp-message');
         const feedbackElement = document.getElementById('staff-whatsapp-feedback');
-        if (!patient || !select || !messageField || !feedbackElement) return false;
+        if (!patient || !select || !phoneField || !messageField || !feedbackElement) return false;
         select.value = patient.id;
+        phoneField.value = formatPhone(patient.phone);
         messageField.value = staffWhatsAppMessage(patient, type, details);
         const phone = normalizePatientPhone(patient.phone);
         feedbackElement.textContent = phone
           ? 'Mensagem pronta para revisão antes de abrir o WhatsApp.'
-          : 'Este cliente ainda não informou WhatsApp. O acesso ao portal dele continua normal.';
+          : 'Informe o WhatsApp deste cliente para abrir a conversa. O número será salvo ao enviar.';
         if (reveal) document.getElementById('staff-message-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return Boolean(phone);
       }
@@ -2512,32 +2515,69 @@
       document.getElementById('staff-whatsapp-patient').addEventListener('change', (event) => {
         const feedbackElement = document.getElementById('staff-whatsapp-feedback');
         if (!event.target.value) {
+          document.getElementById('staff-whatsapp-phone').value = '';
           document.getElementById('staff-whatsapp-message').value = '';
           feedbackElement.textContent = '';
           return;
         }
         prepareStaffWhatsAppMessage(event.target.value);
       });
-      document.getElementById('staff-whatsapp-form').addEventListener('submit', (event) => {
+      document.getElementById('staff-whatsapp-form').addEventListener('submit', async (event) => {
         event.preventDefault();
         const patient = staffPatientById(document.getElementById('staff-whatsapp-patient').value);
+        const phoneField = document.getElementById('staff-whatsapp-phone');
         const message = document.getElementById('staff-whatsapp-message').value.trim();
         const feedbackElement = document.getElementById('staff-whatsapp-feedback');
-        const phone = normalizePatientPhone(patient?.phone);
         if (!patient) {
           feedbackElement.textContent = 'Escolha um cliente antes de abrir o WhatsApp.';
           return;
         }
+        const phone = normalizePatientPhone(phoneField.value);
         if (!phone) {
-          feedbackElement.textContent = 'Este cliente ainda não informou WhatsApp. O acesso ao portal dele continua normal.';
+          feedbackElement.textContent = 'Digite um WhatsApp válido com DDD. Exemplo: (11) 99999-9999.';
+          phoneField.focus();
           return;
         }
         if (!message) {
           feedbackElement.textContent = 'Escreva uma mensagem breve antes de abrir o WhatsApp.';
           return;
         }
-        window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
-        feedbackElement.textContent = 'Conversa aberta com a mensagem pronta. Revise e envie pelo WhatsApp.';
+        const whatsappUrl = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
+        const phoneChanged = phone !== normalizePatientPhone(patient.phone);
+        if (phoneChanged && !patientPhoneColumnAvailable) {
+          feedbackElement.textContent = 'Atualize o banco executando o arquivo supabase-setup.sql para salvar WhatsApps de clientes.';
+          return;
+        }
+        let conversationWindow = null;
+        try {
+          // Abre dentro do gesto de clique, evitando que navegadores bloqueiem a conversa como pop-up.
+          conversationWindow = window.open(phoneChanged ? '' : whatsappUrl, '_blank');
+          if (conversationWindow) conversationWindow.opener = null;
+        } catch (error) {
+          conversationWindow = null;
+        }
+        if (phoneChanged) {
+          feedbackElement.textContent = 'Salvando WhatsApp do cliente…';
+          const { error } = await supabaseClient
+            .from('patient_profiles')
+            .update({ phone })
+            .eq('id', patient.id);
+          if (error) {
+            if (conversationWindow && !conversationWindow.closed) conversationWindow.close();
+            feedbackElement.textContent = hasUnavailablePatientPhoneColumn(error)
+              ? 'Atualize o banco executando o arquivo supabase-setup.sql para salvar WhatsApps de clientes.'
+              : agendaSetupMessage(error);
+            return;
+          }
+          patient.phone = phone;
+        }
+        if (conversationWindow && !conversationWindow.closed) {
+          conversationWindow.location.replace(whatsappUrl);
+          feedbackElement.textContent = 'Conversa aberta com a mensagem pronta. Revise e envie pelo WhatsApp.';
+          return;
+        }
+        feedbackElement.textContent = 'Abrindo a conversa do cliente…';
+        window.location.assign(whatsappUrl);
       });
       document.getElementById('staff-availability-calendar').addEventListener('click', async (event) => {
         const button = event.target.closest('[data-close-availability]');
