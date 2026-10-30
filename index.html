@@ -1061,6 +1061,7 @@
       const localSiteImagesKey = 'diego-iamoto-site-images-v1';
       const localEditableTextKey = 'diego-iamato-inline-text-v1';
       const localClinicContactKey = 'diego-iamato-clinic-contact-v1';
+      const hiddenCancelledAppointmentsStorageKey = 'diego-iamato-hidden-cancelled-appointments-v1';
       const portalThemeStorageKey = 'diego-iamato-portal-theme-v1';
       const siteImageDefaults = {
         clinic: 'assets/dr-diego.png',
@@ -1093,6 +1094,7 @@
       let staffCalendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
       let clinicContentRefreshTimer = 0;
       let patientPhoneColumnAvailable = true;
+      let hiddenCancelledAppointmentIds = new Set();
 
       function readLocalObject(key) {
         try {
@@ -1111,6 +1113,20 @@
           return false;
         }
       }
+
+      function restoreHiddenCancelledAppointments() {
+        const savedIds = readLocalObject(hiddenCancelledAppointmentsStorageKey);
+        hiddenCancelledAppointmentIds = new Set(
+          Array.isArray(savedIds) ? savedIds.filter((id) => typeof id === 'string') : []
+        );
+      }
+
+      function hideCancelledAppointmentFromStaffView(appointmentId) {
+        hiddenCancelledAppointmentIds.add(appointmentId);
+        writeLocalObject(hiddenCancelledAppointmentsStorageKey, [...hiddenCancelledAppointmentIds]);
+      }
+
+      restoreHiddenCancelledAppointments();
 
       function getSavedPortalTheme() {
         try {
@@ -1785,7 +1801,14 @@
           list.innerHTML = '<p class="portal-empty">Nenhuma consulta cadastrada ainda.</p>';
           return;
         }
-        list.innerHTML = staffAppointments.map((appointment) => {
+        const visibleAppointments = staffAppointments.filter((appointment) => (
+          appointment.status !== 'cancelled' || !hiddenCancelledAppointmentIds.has(appointment.id)
+        ));
+        if (!visibleAppointments.length) {
+          list.innerHTML = '<p class="portal-empty">Nenhuma consulta para exibir. As canceladas removidas continuam registradas no histórico.</p>';
+          return;
+        }
+        list.innerHTML = visibleAppointments.map((appointment) => {
           const profile = profileFromAppointment(appointment);
           const patientName = escapeHtml(profile.full_name || profile.email || 'Paciente');
           const message = appointment.patient_message ? '<p>' + escapeHtml(appointment.patient_message) + '</p>' : '';
@@ -1795,9 +1818,12 @@
           const cancelAction = appointment.status !== 'cancelled' && appointment.status !== 'completed'
             ? '<button class="appointment-action appointment-action-danger" type="button" data-cancel-appointment="' + appointment.id + '">Cancelar consulta</button>'
             : '';
+          const hideAction = appointment.status === 'cancelled'
+            ? '<button class="appointment-action appointment-action-danger" type="button" data-hide-cancelled-appointment="' + appointment.id + '" aria-label="Remover consulta cancelada da tela" title="Remover da tela">×</button>'
+            : '';
           const whatsappAction = '<button class="appointment-action" type="button" data-prepare-whatsapp="' + appointment.id + '">Mensagem WhatsApp</button>';
           const duration = appointment.duration_minutes ? ' · ' + formatDuration(Number(appointment.duration_minutes)) : '';
-          return '<article class="appointment-item"><strong>' + patientName + '</strong><span>' + formatAppointmentDate(appointment.scheduled_at) + duration + '</span>' + message + '<div class="appointment-meta"><span class="status-pill">' + statusLabel(appointment.status) + '</span><div class="appointment-actions">' + whatsappAction + confirmAction + cancelAction + '</div></div></article>';
+          return '<article class="appointment-item"><strong>' + patientName + '</strong><span>' + formatAppointmentDate(appointment.scheduled_at) + duration + '</span>' + message + '<div class="appointment-meta"><span class="status-pill">' + statusLabel(appointment.status) + '</span><div class="appointment-actions">' + whatsappAction + confirmAction + cancelAction + hideAction + '</div></div></article>';
         }).join('');
       }
 
@@ -2585,8 +2611,15 @@
         await loadStaffAgenda();
       });
       document.getElementById('staff-appointments-list').addEventListener('click', async (event) => {
-        const button = event.target.closest('[data-prepare-whatsapp], [data-confirm-appointment], [data-cancel-appointment]');
+        const button = event.target.closest('[data-prepare-whatsapp], [data-confirm-appointment], [data-cancel-appointment], [data-hide-cancelled-appointment]');
         if (!button) return;
+        if (button.dataset.hideCancelledAppointment) {
+          const appointment = staffAppointments.find((item) => item.id === button.dataset.hideCancelledAppointment);
+          if (!appointment || appointment.status !== 'cancelled') return;
+          hideCancelledAppointmentFromStaffView(appointment.id);
+          renderStaffAppointments();
+          return;
+        }
         if (button.dataset.prepareWhatsapp) {
           const appointment = staffAppointments.find((item) => item.id === button.dataset.prepareWhatsapp);
           if (!appointment) return;
