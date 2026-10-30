@@ -746,10 +746,10 @@
           </div>
           <div class="agenda-card" id="staff-message-card">
             <h3>Mensagem por WhatsApp</h3>
-            <p class="staff-message-help">Escolha o cliente, confirme o WhatsApp e revise a mensagem antes de abrir a conversa. As orientações completas continuam protegidas no portal.</p>
+            <p class="staff-message-help">Escolha o cliente e revise a mensagem. O WhatsApp salvo no cadastro dele será usado automaticamente para abrir a conversa.</p>
             <form class="agenda-form" id="staff-whatsapp-form" novalidate>
               <label class="agenda-field">Cliente<select id="staff-whatsapp-patient"><option value="">Carregando clientes…</option></select></label>
-              <label class="agenda-field">WhatsApp do cliente<input id="staff-whatsapp-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" /></label>
+              <label class="agenda-field">WhatsApp salvo no cadastro<input id="staff-whatsapp-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="O número aparecerá ao escolher o cliente" readonly aria-readonly="true" /></label>
               <label class="agenda-field">Mensagem<textarea id="staff-whatsapp-message" placeholder="A mensagem para o cliente aparecerá aqui."></textarea></label>
               <button class="btn btn-primary" type="submit">Abrir WhatsApp com a mensagem</button>
               <p class="agenda-feedback" id="staff-whatsapp-feedback" aria-live="polite"></p>
@@ -1774,7 +1774,7 @@
         const phone = normalizePatientPhone(patient.phone);
         feedbackElement.textContent = phone
           ? 'Mensagem pronta para revisão antes de abrir o WhatsApp.'
-          : 'Informe o WhatsApp deste cliente para abrir a conversa. O número será salvo ao enviar.';
+          : 'Este cliente ainda não tem WhatsApp salvo no cadastro.';
         if (reveal) document.getElementById('staff-message-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return Boolean(phone);
       }
@@ -2558,10 +2558,9 @@
           feedbackElement.textContent = 'Escolha um cliente antes de abrir o WhatsApp.';
           return;
         }
-        const phone = normalizePatientPhone(phoneField.value);
+        const phone = normalizePatientPhone(patient.phone);
         if (!phone) {
-          feedbackElement.textContent = 'Digite um WhatsApp válido com DDD. Exemplo: (11) 99999-9999.';
-          phoneField.focus();
+          feedbackElement.textContent = 'Este cliente ainda não tem WhatsApp salvo no cadastro. Peça que ele complete o número ao criar a conta.';
           return;
         }
         if (!message) {
@@ -2569,27 +2568,8 @@
           return;
         }
         const whatsappUrl = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
-        const phoneChanged = phone !== normalizePatientPhone(patient.phone);
-        if (phoneChanged && patientPhoneColumnAvailable) {
-          feedbackElement.textContent = 'Salvando WhatsApp do cliente…';
-          const { error } = await supabaseClient
-            .from('patient_profiles')
-            .update({ phone })
-            .eq('id', patient.id);
-          if (error) {
-            if (conversationWindow && !conversationWindow.closed) conversationWindow.close();
-            feedbackElement.textContent = hasUnavailablePatientPhoneColumn(error)
-              ? 'Atualize o banco executando o arquivo supabase-setup.sql para salvar WhatsApps de clientes.'
-              : agendaSetupMessage(error);
-            return;
-          }
-          patient.phone = phone;
-        }
-        if (phoneChanged && !patientPhoneColumnAvailable) {
-          feedbackElement.textContent = 'Abrindo a conversa. Este número não será salvo até o banco ser atualizado com o arquivo supabase-setup.sql.';
-        } else {
-          feedbackElement.textContent = 'Abrindo a conversa com a mensagem pronta…';
-        }
+        phoneField.value = formatPhone(phone);
+        feedbackElement.textContent = 'Abrindo a conversa com a mensagem pronta…';
         window.location.assign(whatsappUrl);
       });
       document.getElementById('staff-availability-calendar').addEventListener('click', async (event) => {
